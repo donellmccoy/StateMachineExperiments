@@ -13,6 +13,13 @@ namespace StateMachineExperiments.Models
         public string? MemberId { get; set; }
         public string? MemberName { get; set; }
         
+        // Business decision flags - evaluated dynamically during workflow
+        public bool RequiresLegalReview { get; set; }
+        public bool RequiresWingReview { get; set; }
+        public bool AppealFiled { get; set; }
+        public decimal? EstimatedCost { get; set; }
+        public int? InjurySeverity { get; set; }
+        
         // Navigation property
         public ICollection<StateTransitionHistory> TransitionHistory { get; set; } = [];
     }

@@ -22,7 +22,9 @@ namespace StateMachineExperiments
             await context.Database.EnsureCreatedAsync();
             Console.WriteLine("✓ Database initialized\n");
 
-            var service = new LodStateMachineService(context);
+            // Setup dependency injection
+            ILodDataService dataService = new LodDataService(context);
+            var service = new LodStateMachineService(dataService);
 
             // ===========================================
             // SCENARIO 1: Full workflow with all optional reviews and appeal
@@ -32,18 +34,28 @@ namespace StateMachineExperiments
             Console.WriteLine("╚═══════════════════════════════════════════════════════════╝\n");
 
             var case1 = await service.CreateNewCaseAsync("LOD-2026-001", "M123456", "SSgt John Doe");
-            Console.WriteLine($"✓ Created Case: {case1.CaseNumber} (ID: {case1.Id})\n");
+            
+            // Set business decision flags - this case requires full review process
+            case1.RequiresLegalReview = true;
+            case1.RequiresWingReview = true;
+            case1.InjurySeverity = 8;
+            case1.EstimatedCost = 75000;
+            await dataService.UpdateCaseAsync(case1);
+            
+            Console.WriteLine($"✓ Created Case: {case1.CaseNumber} (ID: {case1.Id})");
+            Console.WriteLine($"  - Requires Legal Review: {case1.RequiresLegalReview}");
+            Console.WriteLine($"  - Requires Wing Review: {case1.RequiresWingReview}\n");
 
             await service.FireTriggerAsync(case1.Id, LodTrigger.ProcessInitiated);
             await service.FireTriggerAsync(case1.Id, LodTrigger.ConditionReported, notes: "Member reported injury during PT");
-            await service.FireTriggerAsync(case1.Id, LodTrigger.InitiationComplete, true, "All medical records received");
+            await service.FireTriggerAsync(case1.Id, LodTrigger.InitiationComplete, "All medical records received");
             await service.FireTriggerAsync(case1.Id, LodTrigger.AssessmentDone, notes: "Medical assessment completed");
-            await service.FireTriggerAsync(case1.Id, LodTrigger.ReviewFinished, true, "Legal review required");
-            await service.FireTriggerAsync(case1.Id, LodTrigger.LegalDone, true, "Wing review required");
+            await service.FireTriggerAsync(case1.Id, LodTrigger.ReviewFinished, "Routing to legal review");
+            await service.FireTriggerAsync(case1.Id, LodTrigger.LegalDone, "Routing to wing review");
             await service.FireTriggerAsync(case1.Id, LodTrigger.WingDone, notes: "Wing commander approved");
             await service.FireTriggerAsync(case1.Id, LodTrigger.AdjudicationComplete, notes: "Board determined in line of duty");
             await service.FireTriggerAsync(case1.Id, LodTrigger.DeterminationFinalized, notes: "Approved by HQ AFRC/A1");
-            await service.FireTriggerAsync(case1.Id, LodTrigger.AppealRequested, true, "Member filed appeal within deadline");
+            await service.FireTriggerAsync(case1.Id, LodTrigger.AppealFiled, "Member filed appeal within deadline");
             await service.FireTriggerAsync(case1.Id, LodTrigger.AppealResolved, notes: "Appeal denied, original determination upheld");
 
             var finalCase1 = await service.GetCaseAsync(case1.Id);
@@ -58,16 +70,26 @@ namespace StateMachineExperiments
             Console.WriteLine("╚═══════════════════════════════════════════════════════════╝\n");
 
             var case2 = await service.CreateNewCaseAsync("LOD-2026-002", "M789012", "A1C Jane Smith");
-            Console.WriteLine($"✓ Created Case: {case2.CaseNumber} (ID: {case2.Id})\n");
+            
+            // Simple case - no optional reviews needed
+            case2.RequiresLegalReview = false;
+            case2.RequiresWingReview = false;
+            case2.InjurySeverity = 3;
+            case2.EstimatedCost = 5000;
+            await dataService.UpdateCaseAsync(case2);
+            
+            Console.WriteLine($"✓ Created Case: {case2.CaseNumber} (ID: {case2.Id})");
+            Console.WriteLine($"  - Requires Legal Review: {case2.RequiresLegalReview}");
+            Console.WriteLine($"  - Requires Wing Review: {case2.RequiresWingReview}\n");
 
             await service.FireTriggerAsync(case2.Id, LodTrigger.ProcessInitiated);
             await service.FireTriggerAsync(case2.Id, LodTrigger.ConditionReported);
-            await service.FireTriggerAsync(case2.Id, LodTrigger.InitiationComplete, true);
+            await service.FireTriggerAsync(case2.Id, LodTrigger.InitiationComplete);
             await service.FireTriggerAsync(case2.Id, LodTrigger.AssessmentDone);
-            await service.FireTriggerAsync(case2.Id, LodTrigger.ReviewFinished, false, "No optional reviews needed");
+            await service.FireTriggerAsync(case2.Id, LodTrigger.SkipToAdjudication, "No optional reviews needed - fast track");
             await service.FireTriggerAsync(case2.Id, LodTrigger.AdjudicationComplete);
             await service.FireTriggerAsync(case2.Id, LodTrigger.DeterminationFinalized);
-            await service.FireTriggerAsync(case2.Id, LodTrigger.NoAppealRequested, false, "No appeal filed");
+            await service.FireTriggerAsync(case2.Id, LodTrigger.NotificationComplete, "No appeal filed - case closed");
 
             var finalCase2 = await service.GetCaseAsync(case2.Id);
             Console.WriteLine($"\n✓ Final State: {finalCase2!.CurrentState}");
@@ -119,7 +141,7 @@ namespace StateMachineExperiments
             Console.WriteLine($"✓ Permitted Triggers: {string.Join(", ", permittedTriggers)}\n");
 
             // Continue workflow
-            await service.FireTriggerAsync(loadedCase.Id, LodTrigger.InitiationComplete, true);
+            await service.FireTriggerAsync(loadedCase.Id, LodTrigger.InitiationComplete);
             Console.WriteLine($"✓ Resumed and advanced to: {(await service.GetCaseAsync(loadedCase.Id))!.CurrentState}\n");
 
             // ===========================================

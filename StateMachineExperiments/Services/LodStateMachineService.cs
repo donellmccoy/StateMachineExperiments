@@ -48,12 +48,12 @@ namespace StateMachineExperiments.Services
             return await _dataService.GetCaseByCaseNumberAsync(caseNumber);
         }
 
-        public async Task FireTriggerAsync(int caseId, LodTrigger trigger, bool condition = true, string? notes = null)
+        public async Task FireTriggerAsync(int caseId, LodTrigger trigger, string? notes = null)
         {
             var lodCase = await GetCaseAsync(caseId) ?? throw new InvalidOperationException($"Case with ID {caseId} not found.");
 
             var currentState = Enum.Parse<LodState>(lodCase.CurrentState);
-            var stateMachine = ConfigureStateMachine(currentState, condition);
+            var stateMachine = ConfigureStateMachine(currentState, lodCase);
 
             if (!stateMachine.CanFire(trigger))
             {
@@ -101,7 +101,7 @@ namespace StateMachineExperiments.Services
             }
 
             var currentState = Enum.Parse<LodState>(lodCase.CurrentState);
-            var stateMachine = ConfigureStateMachine(currentState, true);
+            var stateMachine = ConfigureStateMachine(currentState, lodCase);
 
             return [.. (await stateMachine.PermittedTriggersAsync).Select(t => t.ToString())];
         }
@@ -111,7 +111,7 @@ namespace StateMachineExperiments.Services
             return _stateToAuthorityMap.GetValueOrDefault(state, LodAuthority.None).ToString();
         }
 
-        private static StateMachine<LodState, LodTrigger> ConfigureStateMachine(LodState initialState, bool conditionFlag)
+        private static StateMachine<LodState, LodTrigger> ConfigureStateMachine(LodState initialState, InformalLineOfDuty lodCase)
         {
             var stateMachine = new StateMachine<LodState, LodTrigger>(initialState);
 
@@ -123,23 +123,23 @@ namespace StateMachineExperiments.Services
             stateMachine.Configure(LodState.MemberReports)
                 .Permit(LodTrigger.ConditionReported, LodState.LodInitiation);
 
-            // Configure LodInitiation state with conditional guard
+            // Configure LodInitiation state - always proceeds to medical assessment
             stateMachine.Configure(LodState.LodInitiation)
-                .PermitIf(LodTrigger.InitiationComplete, LodState.MedicalAssessment, () => conditionFlag);
+                .Permit(LodTrigger.InitiationComplete, LodState.MedicalAssessment);
 
             // Configure MedicalAssessment state
             stateMachine.Configure(LodState.MedicalAssessment)
                 .Permit(LodTrigger.AssessmentDone, LodState.CommanderReview);
 
-            // Configure CommanderReview state with conditional branching
+            // Configure CommanderReview state - dynamic routing based on case requirements
             stateMachine.Configure(LodState.CommanderReview)
-                .PermitIf(LodTrigger.ReviewFinished, LodState.OptionalLegal, () => conditionFlag)
-                .PermitIf(LodTrigger.ReviewFinished, LodState.BoardAdjudication, () => !conditionFlag);
+                .PermitIf(LodTrigger.ReviewFinished, LodState.OptionalLegal, () => lodCase.RequiresLegalReview)
+                .Permit(LodTrigger.SkipToAdjudication, LodState.BoardAdjudication);
 
-            // Configure OptionalLegal state with conditional branching
+            // Configure OptionalLegal state - dynamic routing based on wing review requirement
             stateMachine.Configure(LodState.OptionalLegal)
-                .PermitIf(LodTrigger.LegalDone, LodState.OptionalWing, () => conditionFlag)
-                .PermitIf(LodTrigger.LegalDone, LodState.BoardAdjudication, () => !conditionFlag);
+                .PermitIf(LodTrigger.LegalDone, LodState.OptionalWing, () => lodCase.RequiresWingReview)
+                .Permit(LodTrigger.SkipWingReview, LodState.BoardAdjudication);
 
             // Configure OptionalWing state
             stateMachine.Configure(LodState.OptionalWing)
@@ -153,10 +153,10 @@ namespace StateMachineExperiments.Services
             stateMachine.Configure(LodState.Determination)
                 .Permit(LodTrigger.DeterminationFinalized, LodState.Notification);
 
-            // Configure Notification state with conditional branching for appeal
+            // Configure Notification state - separate triggers for appeal vs no appeal
             stateMachine.Configure(LodState.Notification)
-                .PermitIf(LodTrigger.AppealRequested, LodState.Appeal, () => conditionFlag)
-                .PermitIf(LodTrigger.NoAppealRequested, LodState.End, () => !conditionFlag);
+                .Permit(LodTrigger.AppealFiled, LodState.Appeal)
+                .Permit(LodTrigger.NotificationComplete, LodState.End);
 
             // Configure Appeal state
             stateMachine.Configure(LodState.Appeal)

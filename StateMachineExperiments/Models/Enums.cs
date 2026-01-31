@@ -25,13 +25,15 @@ namespace StateMachineExperiments.Models
         InitiationComplete,
         AssessmentDone,
         ReviewFinished,
+        SkipToAdjudication,     // Skip optional reviews
         LegalDone,
+        SkipWingReview,          // Skip wing review from legal
         WingDone,
         AdjudicationComplete,
         DeterminationFinalized,
-        AppealRequested,
-        AppealResolved,
-        NoAppealRequested
+        NotificationComplete,    // Member notified, no appeal
+        AppealFiled,
+        AppealResolved
     }
 
     // Enum for Authorities based on DAFI 36-2910 for AFRC Informal LOD
