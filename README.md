@@ -28,38 +28,26 @@ stateDiagram-v2
     direction LR
     
     [*] --> Start
+    Start --> MemberReports: ProcessInitiated
+    MemberReports --> LodInitiation: ConditionReported
+    LodInitiation --> MedicalAssessment: InitiationComplete
+    MedicalAssessment --> CommanderReview: AssessmentDone
     
-    state "Entry & Reporting" {
-        Start --> MemberReports: ProcessInitiated
-        MemberReports --> LodInitiation: ConditionReported
-    }
+    CommanderReview --> OptionalLegal: ReviewFinished
+    CommanderReview --> BoardAdjudication: ReviewFinished (fast-track)
     
-    state "Assessment Phase" {
-        LodInitiation --> MedicalAssessment: InitiationComplete
-        MedicalAssessment --> CommanderReview: AssessmentDone
-    }
+    OptionalLegal --> OptionalWing: LegalDone
+    OptionalLegal --> BoardAdjudication: LegalDone
     
-    state "Review & Optional Paths" {
-        CommanderReview --> OptionalLegal: ReviewFinished
-        CommanderReview --> BoardAdjudication: ReviewFinished (fast-track)
-        
-        OptionalLegal --> OptionalWing: LegalDone
-        OptionalLegal --> BoardAdjudication: LegalDone
-        
-        OptionalWing --> BoardAdjudication: WingDone
-    }
+    OptionalWing --> BoardAdjudication: WingDone
     
-    state "Determination & Finalization" {
-        BoardAdjudication --> Determination: AdjudicationComplete
-        Determination --> Notification: DeterminationFinalized
-    }
+    BoardAdjudication --> Determination: AdjudicationComplete
+    Determination --> Notification: DeterminationFinalized
     
-    state "Resolution" {
-        Notification --> Appeal: AppealRequested
-        Notification --> End: NoAppealRequested
-        Appeal --> End: AppealResolved
-    }
+    Notification --> Appeal: AppealRequested
+    Notification --> End: NoAppealRequested
     
+    Appeal --> End: AppealResolved
     End --> [*]
     
     classDef optional fill:#ffc107,stroke:#ff9800,stroke-width:3px,color:#000
@@ -79,6 +67,25 @@ stateDiagram-v2
 - 🟢 **Green**: Decision points with branching logic
 - 🟡 **Yellow**: Optional review states (conditional)
 - ⚫ **Gray**: Terminal states (start/end)
+
+### Workflow Phases
+
+**1. Entry & Reporting**
+- `Start` → `MemberReports` → `LodInitiation`
+
+**2. Assessment Phase**
+- `MedicalAssessment` → `CommanderReview`
+
+**3. Review & Optional Paths**
+- `OptionalLegal` (conditional)
+- `OptionalWing` (conditional)
+- `BoardAdjudication` (required)
+
+**4. Determination & Finalization**
+- `Determination` → `Notification`
+
+**5. Resolution**
+- `Appeal` (optional) → `End`
 
 ### State Machine Components
 
