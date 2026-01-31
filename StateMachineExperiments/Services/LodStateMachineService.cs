@@ -37,7 +37,7 @@ namespace StateMachineExperiments.Services
 
         public async Task<InformalLineOfDuty> CreateNewCaseAsync(string caseNumber, string? memberId = null, string? memberName = null)
         {
-            _context.LodCases.Add(new InformalLineOfDuty
+            var entity =_context.LodCases.Add(new InformalLineOfDuty
             {
                 CaseNumber = caseNumber,
                 MemberId = memberId,
@@ -62,24 +62,17 @@ namespace StateMachineExperiments.Services
 
         public async Task<InformalLineOfDuty?> GetCaseAsync(int caseId)
         {
-            return await _context.LodCases
-                .Include(c => c.TransitionHistory).FirstOrDefaultAsync(c => c.Id == caseId);
+            return await _context.LodCases.Include(c => c.TransitionHistory).FirstOrDefaultAsync(c => c.Id == caseId);
         }
 
         public async Task<InformalLineOfDuty?> GetCaseByCaseNumberAsync(string caseNumber)
         {
-            return await _context.LodCases
-                .Include(c => c.TransitionHistory).FirstOrDefaultAsync(c => c.CaseNumber == caseNumber);
+            return await _context.LodCases.Include(c => c.TransitionHistory).FirstOrDefaultAsync(c => c.CaseNumber == caseNumber);
         }
 
         public async Task FireTriggerAsync(int caseId, LodTrigger trigger, bool condition = true, string? notes = null)
         {
-            var lodCase = await GetCaseAsync(caseId);
-            if (lodCase == null)
-            {
-                throw new InvalidOperationException($"Case with ID {caseId} not found.");
-            }
-
+            var lodCase = await GetCaseAsync(caseId) ?? throw new InvalidOperationException($"Case with ID {caseId} not found.");
 
             var currentState = Enum.Parse<LodState>(lodCase.CurrentState);
             var stateMachine = ConfigureStateMachine(currentState, condition);
@@ -87,7 +80,7 @@ namespace StateMachineExperiments.Services
             if (!stateMachine.CanFire(trigger))
             {
                 var permitted = string.Join(", ", await stateMachine.PermittedTriggersAsync ?? []);
-                
+
                 throw new InvalidOperationException($"Cannot fire trigger '{trigger}' in state '{currentState}'. Permitted triggers: {permitted}");
             }
 
@@ -127,11 +120,11 @@ namespace StateMachineExperiments.Services
         public async Task<List<string>> GetPermittedTriggersAsync(int caseId)
         {
             var lodCase = await GetCaseAsync(caseId);
+
             if (lodCase == null)
             {
                 return [];
             }
-
 
             var currentState = Enum.Parse<LodState>(lodCase.CurrentState);
             var stateMachine = ConfigureStateMachine(currentState, true);
