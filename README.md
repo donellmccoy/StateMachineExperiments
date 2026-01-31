@@ -25,45 +25,49 @@ This project demonstrates a complete state machine implementation for managing A
 ```mermaid
 stateDiagram-v2
     [*] --> Start
-    Start --> MemberReports: TRIGGER: ProcessInitiated
-    MemberReports --> LodInitiation: TRIGGER: ConditionReported
-    LodInitiation --> MedicalAssessment: TRIGGER: InitiationComplete
-    MedicalAssessment --> CommanderReview: TRIGGER: AssessmentDone
+    Start --> MemberReports: ProcessInitiated
+    MemberReports --> LodInitiation: ConditionReported
+    LodInitiation --> MedicalAssessment: InitiationComplete
+    MedicalAssessment --> CommanderReview: AssessmentDone
     
-    CommanderReview --> OptionalLegal: TRIGGER: ReviewFinished<br/>(condition: true)
-    CommanderReview --> BoardAdjudication: TRIGGER: ReviewFinished<br/>(condition: false)
+    CommanderReview --> OptionalLegal: ReviewFinished (if legal review needed)
+    CommanderReview --> BoardAdjudication: ReviewFinished (fast-track)
     
-    OptionalLegal --> OptionalWing: TRIGGER: LegalDone<br/>(condition: true)
-    OptionalLegal --> BoardAdjudication: TRIGGER: LegalDone<br/>(condition: false)
+    OptionalLegal --> OptionalWing: LegalDone (if wing review needed)
+    OptionalLegal --> BoardAdjudication: LegalDone (skip wing review)
     
-    OptionalWing --> BoardAdjudication: TRIGGER: WingDone
+    OptionalWing --> BoardAdjudication: WingDone
     
-    BoardAdjudication --> Determination: TRIGGER: AdjudicationComplete
-    Determination --> Notification: TRIGGER: DeterminationFinalized
+    BoardAdjudication --> Determination: AdjudicationComplete
+    Determination --> Notification: DeterminationFinalized
     
-    Notification --> Appeal: TRIGGER: AppealRequested<br/>(condition: true)
-    Notification --> End: TRIGGER: NoAppealRequested<br/>(condition: false)
+    Notification --> Appeal: AppealRequested
+    Notification --> End: NoAppealRequested
     
-    Appeal --> End: TRIGGER: AppealResolved
+    Appeal --> End: AppealResolved
     End --> [*]
     
     note left of Start
-        📦 STATES (boxes):<br/>Current position in workflow<br/>Examples: Start, MemberReports,<br/>CommanderReview, End
+        STATES are the boxes
+        representing current
+        position in the workflow
     end note
     
-    note right of OptionalLegal
-        ⚡ TRIGGERS (arrows):<br/>Events causing transitions<br/>Examples: ProcessInitiated,<br/>ReviewFinished, LegalDone
+    note right of End
+        TRIGGERS are the arrow labels
+        representing events that
+        cause state transitions
     end note
 ```
 
 ### State Machine Components
 
-**States** (Boxes in diagram):
+**States** (represented as boxes in the diagram):
 - `Start`, `MemberReports`, `LodInitiation`, `MedicalAssessment`
 - `CommanderReview`, `OptionalLegal`, `OptionalWing`
 - `BoardAdjudication`, `Determination`, `Notification`, `Appeal`, `End`
 
-**Triggers** (Arrow labels in diagram):
+**Triggers** (represented as arrow labels in the diagram):
 - `ProcessInitiated`, `ConditionReported`, `InitiationComplete`
 - `AssessmentDone`, `ReviewFinished`, `LegalDone`, `WingDone`
 - `AdjudicationComplete`, `DeterminationFinalized`
