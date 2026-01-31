@@ -28,27 +28,41 @@ stateDiagram-v2
     direction TB
     
     [*] --> Start
-    Start --> MemberReports: ProcessInitiated
-    MemberReports --> LodInitiation: ConditionReported
-    LodInitiation --> MedicalAssessment: InitiationComplete
-    MedicalAssessment --> CommanderReview: AssessmentDone
     
-    CommanderReview --> OptionalLegal: ReviewFinished
-    CommanderReview --> BoardAdjudication: ReviewFinished (fast-track)
+    Start --> MemberReports: Process Initiated
+    MemberReports --> LodInitiation: Condition Reported
+    LodInitiation --> MedicalAssessment: Initiation Complete
+    MedicalAssessment --> CommanderReview: Assessment Done
     
-    OptionalLegal --> OptionalWing: LegalDone
-    OptionalLegal --> BoardAdjudication: LegalDone
+    CommanderReview --> OptionalLegal: Review Finished
+    CommanderReview --> BoardAdjudication: Review Finished (fast-track)
     
-    OptionalWing --> BoardAdjudication: WingDone
+    OptionalLegal --> OptionalWing: Legal Done
+    OptionalLegal --> BoardAdjudication: Legal Done
     
-    BoardAdjudication --> Determination: AdjudicationComplete
-    Determination --> Notification: DeterminationFinalized
+    OptionalWing --> BoardAdjudication: Wing Done
     
-    Notification --> Appeal: AppealRequested
-    Notification --> End: NoAppealRequested
+    BoardAdjudication --> Determination: Adjudication Complete
+    Determination --> Notification: Determination Finalized
     
-    Appeal --> End: AppealResolved
+    Notification --> Appeal: Appeal Requested
+    Notification --> End: No Appeal Requested
+    
+    Appeal --> End: Appeal Resolved
     End --> [*]
+    
+    state "⚫  Start  ⚫" as Start
+    state "📝  Member Reports" as MemberReports
+    state "🚀  LOD Initiation" as LodInitiation
+    state "🏥  Medical Assessment" as MedicalAssessment
+    state "👔  Commander Review" as CommanderReview
+    state "⚖️  Legal Review" as OptionalLegal
+    state "🎖️  Wing Review" as OptionalWing
+    state "👥  Board Adjudication" as BoardAdjudication
+    state "✅  Determination" as Determination
+    state "📢  Notification" as Notification
+    state "📋  Appeal" as Appeal
+    state "⚫  End  ⚫" as End
     
     classDef optional fill:#ffc107,stroke:#ff9800,stroke-width:3px,color:#000
     classDef required fill:#0066cc,stroke:#004999,stroke-width:2px,color:#fff
