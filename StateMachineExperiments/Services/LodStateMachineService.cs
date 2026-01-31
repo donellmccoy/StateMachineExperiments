@@ -86,9 +86,9 @@ namespace StateMachineExperiments.Services
 
             if (!stateMachine.CanFire(trigger))
             {
-                var permitted = string.Join(", ", await stateMachine.PermittedTriggersAsync ?? Array.Empty<LodTrigger>());
-                throw new InvalidOperationException(
-                    $"Cannot fire trigger '{trigger}' in state '{currentState}'. Permitted triggers: {permitted}");
+                var permitted = string.Join(", ", await stateMachine.PermittedTriggersAsync ?? []);
+                
+                throw new InvalidOperationException($"Cannot fire trigger '{trigger}' in state '{currentState}'. Permitted triggers: {permitted}");
             }
 
             var fromState = lodCase.CurrentState;
