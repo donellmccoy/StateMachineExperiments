@@ -25,7 +25,7 @@ This project demonstrates a complete state machine implementation for managing A
 ```mermaid
 %%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#0066cc','primaryTextColor':'#fff','primaryBorderColor':'#004999','lineColor':'#666','secondaryColor':'#28a745','tertiaryColor':'#ffc107'}}}%%
 stateDiagram-v2
-    direction LR
+    direction TB
     
     [*] --> Start
     Start --> MemberReports: ProcessInitiated
