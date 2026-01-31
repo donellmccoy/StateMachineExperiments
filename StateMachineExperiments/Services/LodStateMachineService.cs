@@ -1,6 +1,4 @@
-using Microsoft.EntityFrameworkCore;
 using Stateless;
-using StateMachineExperiments.Data;
 using StateMachineExperiments.Models;
 using System;
 using System.Collections.Generic;
@@ -11,12 +9,12 @@ namespace StateMachineExperiments.Services
 {
     public class LodStateMachineService : ILodStateMachineService
     {
-        private readonly LodDbContext _context;
+        private readonly ILodDataService _dataService;
         private readonly Dictionary<LodState, LodAuthority> _stateToAuthorityMap;
 
-        public LodStateMachineService(LodDbContext context)
+        public LodStateMachineService(ILodDataService dataService)
         {
-            _context = context;
+            _dataService = dataService;
 
             _stateToAuthorityMap = new Dictionary<LodState, LodAuthority>
             {
@@ -37,37 +35,17 @@ namespace StateMachineExperiments.Services
 
         public async Task<InformalLineOfDuty> CreateNewCaseAsync(string caseNumber, string? memberId = null, string? memberName = null)
         {
-            var entity =_context.LodCases.Add(new InformalLineOfDuty
-            {
-                CaseNumber = caseNumber,
-                MemberId = memberId,
-                MemberName = memberName,
-                CurrentState = nameof(LodState.Start),
-                CreatedDate = DateTime.UtcNow,
-                LastModifiedDate = DateTime.UtcNow
-            });
-
-            await _context.SaveChangesAsync();
-
-            return new InformalLineOfDuty
-            {
-                CaseNumber = caseNumber,
-                MemberId = memberId,
-                MemberName = memberName,
-                CurrentState = nameof(LodState.Start),
-                CreatedDate = DateTime.UtcNow,
-                LastModifiedDate = DateTime.UtcNow
-            };
+            return await _dataService.CreateNewCaseAsync(caseNumber, memberId, memberName);
         }
 
         public async Task<InformalLineOfDuty?> GetCaseAsync(int caseId)
         {
-            return await _context.LodCases.Include(c => c.TransitionHistory).FirstOrDefaultAsync(c => c.Id == caseId);
+            return await _dataService.GetCaseAsync(caseId);
         }
 
         public async Task<InformalLineOfDuty?> GetCaseByCaseNumberAsync(string caseNumber)
         {
-            return await _context.LodCases.Include(c => c.TransitionHistory).FirstOrDefaultAsync(c => c.CaseNumber == caseNumber);
+            return await _dataService.GetCaseByCaseNumberAsync(caseNumber);
         }
 
         public async Task FireTriggerAsync(int caseId, LodTrigger trigger, bool condition = true, string? notes = null)
@@ -91,9 +69,10 @@ namespace StateMachineExperiments.Services
             // Update case state
             lodCase.CurrentState = toState;
             lodCase.LastModifiedDate = DateTime.UtcNow;
+            await _dataService.UpdateCaseAsync(lodCase);
 
             // Record transition
-            _context.TransitionHistory.Add(new StateTransitionHistory
+            await _dataService.AddTransitionHistoryAsync(new StateTransitionHistory
             {
                 LodCaseId = caseId,
                 FromState = fromState,
@@ -104,17 +83,12 @@ namespace StateMachineExperiments.Services
                 Notes = notes
             });
 
-            await _context.SaveChangesAsync();
-
             Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] Transition: {fromState} -> {toState} | Trigger: {trigger}");
         }
 
         public async Task<List<StateTransitionHistory>> GetCaseHistoryAsync(int caseId)
         {
-            return await _context.TransitionHistory
-                .Where(h => h.LodCaseId == caseId)
-                .OrderBy(h => h.Timestamp)
-                .ToListAsync();
+            return await _dataService.GetCaseHistoryAsync(caseId);
         }
 
         public async Task<List<string>> GetPermittedTriggersAsync(int caseId)
