@@ -12,13 +12,15 @@ This project demonstrates a complete state machine implementation for managing A
 
 ## Features
 
--  Complete LOD workflow with configurable state transitions
--  Persistent state storage using Entity Framework Core
--  Full transition history tracking
--  Authority mapping for each state
--  Conditional branching (optional Legal/Wing reviews)
--  Resume capability - cases can be paused and resumed
--  Multiple scenario demonstrations
+- Complete LOD workflow with configurable state transitions
+
+- Persistent state storage using Entity Framework Core
+
+- Full transition history tracking
+- Authority mapping for each state
+- Conditional branching (optional Legal/Wing reviews)
+- Resume capability - cases can be paused and resumed
+- Multiple scenario demonstrations
 
 ## State Machine Workflow
 
@@ -101,26 +103,32 @@ stateDiagram-v2
 
 ### Workflow Phases
 
-**1. Entry & Reporting**
+#### 1. Entry & Reporting
+
 - `Start` → `MemberReports` → `LodInitiation`
 
-**2. Assessment Phase**
+#### 2. Assessment Phase
+
 - `MedicalAssessment` → `CommanderReview`
 
-**3. Review & Optional Paths**
+#### 3. Review & Optional Paths
+
 - `OptionalLegal` (conditional)
 - `OptionalWing` (conditional)
 - `BoardAdjudication` (required)
 
-**4. Determination & Finalization**
+#### 4. Determination & Finalization
+
 - `Determination` → `Notification`
 
-**5. Resolution**
+#### 5. Resolution
+
 - `Appeal` (optional) → `End`
 
 ### State Machine Components
 
 **States** (workflow positions):
+
 - **Entry**: `Start`, `MemberReports`, `LodInitiation`
 - **Assessment**: `MedicalAssessment`, `CommanderReview`
 - **Optional Reviews**: `OptionalLegal`, `OptionalWing`
@@ -128,6 +136,7 @@ stateDiagram-v2
 - **Resolution**: `Appeal`, `End`
 
 **Triggers** (transition events):
+
 - `ProcessInitiated`, `ConditionReported`, `InitiationComplete`
 - `AssessmentDone`, `ReviewFinished`, `LegalDone`, `WingDone`
 - `AdjudicationComplete`, `DeterminationFinalized`
