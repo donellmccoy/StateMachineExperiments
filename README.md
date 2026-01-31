@@ -23,51 +23,73 @@ This project demonstrates a complete state machine implementation for managing A
 ## State Machine Workflow
 
 ```mermaid
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#0066cc','primaryTextColor':'#fff','primaryBorderColor':'#004999','lineColor':'#666','secondaryColor':'#28a745','tertiaryColor':'#ffc107'}}}%%
 stateDiagram-v2
+    direction LR
+    
     [*] --> Start
-    Start --> MemberReports: ProcessInitiated
-    MemberReports --> LodInitiation: ConditionReported
-    LodInitiation --> MedicalAssessment: InitiationComplete
-    MedicalAssessment --> CommanderReview: AssessmentDone
     
-    CommanderReview --> OptionalLegal: ReviewFinished (if legal review needed)
-    CommanderReview --> BoardAdjudication: ReviewFinished (fast-track)
+    state "Entry & Reporting" {
+        Start --> MemberReports: ProcessInitiated
+        MemberReports --> LodInitiation: ConditionReported
+    }
     
-    OptionalLegal --> OptionalWing: LegalDone (if wing review needed)
-    OptionalLegal --> BoardAdjudication: LegalDone (skip wing review)
+    state "Assessment Phase" {
+        LodInitiation --> MedicalAssessment: InitiationComplete
+        MedicalAssessment --> CommanderReview: AssessmentDone
+    }
     
-    OptionalWing --> BoardAdjudication: WingDone
+    state "Review & Optional Paths" {
+        CommanderReview --> OptionalLegal: ReviewFinished
+        CommanderReview --> BoardAdjudication: ReviewFinished (fast-track)
+        
+        OptionalLegal --> OptionalWing: LegalDone
+        OptionalLegal --> BoardAdjudication: LegalDone
+        
+        OptionalWing --> BoardAdjudication: WingDone
+    }
     
-    BoardAdjudication --> Determination: AdjudicationComplete
-    Determination --> Notification: DeterminationFinalized
+    state "Determination & Finalization" {
+        BoardAdjudication --> Determination: AdjudicationComplete
+        Determination --> Notification: DeterminationFinalized
+    }
     
-    Notification --> Appeal: AppealRequested
-    Notification --> End: NoAppealRequested
+    state "Resolution" {
+        Notification --> Appeal: AppealRequested
+        Notification --> End: NoAppealRequested
+        Appeal --> End: AppealResolved
+    }
     
-    Appeal --> End: AppealResolved
     End --> [*]
     
-    note left of Start
-        STATES are the boxes
-        representing current
-        position in the workflow
-    end note
+    classDef optional fill:#ffc107,stroke:#ff9800,stroke-width:3px,color:#000
+    classDef required fill:#0066cc,stroke:#004999,stroke-width:2px,color:#fff
+    classDef decision fill:#28a745,stroke:#1e7e34,stroke-width:2px,color:#fff
+    classDef terminal fill:#6c757d,stroke:#495057,stroke-width:2px,color:#fff
     
-    note right of End
-        TRIGGERS are the arrow labels
-        representing events that
-        cause state transitions
-    end note
+    class OptionalLegal,OptionalWing optional
+    class MemberReports,LodInitiation,MedicalAssessment,BoardAdjudication,Determination,Notification required
+    class CommanderReview,Appeal decision
+    class Start,End terminal
 ```
+
+### Legend
+
+- 🔵 **Blue**: Required workflow states
+- 🟢 **Green**: Decision points with branching logic
+- 🟡 **Yellow**: Optional review states (conditional)
+- ⚫ **Gray**: Terminal states (start/end)
 
 ### State Machine Components
 
-**States** (represented as boxes in the diagram):
-- `Start`, `MemberReports`, `LodInitiation`, `MedicalAssessment`
-- `CommanderReview`, `OptionalLegal`, `OptionalWing`
-- `BoardAdjudication`, `Determination`, `Notification`, `Appeal`, `End`
+**States** (workflow positions):
+- **Entry**: `Start`, `MemberReports`, `LodInitiation`
+- **Assessment**: `MedicalAssessment`, `CommanderReview`
+- **Optional Reviews**: `OptionalLegal`, `OptionalWing`
+- **Determination**: `BoardAdjudication`, `Determination`, `Notification`
+- **Resolution**: `Appeal`, `End`
 
-**Triggers** (represented as arrow labels in the diagram):
+**Triggers** (transition events):
 - `ProcessInitiated`, `ConditionReported`, `InitiationComplete`
 - `AssessmentDone`, `ReviewFinished`, `LegalDone`, `WingDone`
 - `AdjudicationComplete`, `DeterminationFinalized`
