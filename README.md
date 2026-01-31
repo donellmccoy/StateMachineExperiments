@@ -21,7 +21,41 @@ This project demonstrates a complete state machine implementation for managing A
 -  Multiple scenario demonstrations
 
 ## State Machine Workflow
+```mermaid
+stateDiagram-v2
+    [*] --> Start
+    Start --> MemberReports: ProcessInitiated
+    MemberReports --> LodInitiation: ConditionReported
+    LodInitiation --> MedicalAssessment: InitiationComplete
+    MedicalAssessment --> CommanderReview: AssessmentDone
+    
+    CommanderReview --> OptionalLegal: ReviewFinished<br/>(Legal Review Required)
+    CommanderReview --> BoardAdjudication: ReviewFinished<br/>(No Optional Reviews)
+    
+    OptionalLegal --> OptionalWing: LegalDone<br/>(Wing Review Required)
+    OptionalLegal --> BoardAdjudication: LegalDone<br/>(Skip Wing Review)
+    
+    OptionalWing --> BoardAdjudication: WingDone
+    
+    BoardAdjudication --> Determination: AdjudicationComplete
+    Determination --> Notification: DeterminationFinalized
+    
+    Notification --> Appeal: AppealRequested
+    Notification --> End: NoAppealRequested
+    
+    Appeal --> End: AppealResolved
+    End --> [*]
+    
+    note right of OptionalLegal
+        Optional reviews are<br/>conditionally executed<br/>based on case requirements
+    end note
+    
+    note right of Appeal
+        Appeal to HQ AFRC/CD<br/>if member requests<br/>within deadline
+    end note
+```
 
+### Workflow Summary
 1. **Start**  Member Reports  LOD Initiation  Medical Assessment
 2. **Commander Review**  Optional Legal Review (conditional)
 3. **Optional Wing Review** (conditional)  Board Adjudication
