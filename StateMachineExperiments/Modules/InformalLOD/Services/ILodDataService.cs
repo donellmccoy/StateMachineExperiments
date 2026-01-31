@@ -1,9 +1,13 @@
-using StateMachineExperiments.Models;
+using StateMachineExperiments.Modules.InformalLOD.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace StateMachineExperiments.Services
+namespace StateMachineExperiments.Modules.InformalLOD.Services
 {
+    /// <summary>
+    /// Data access service for Informal Line of Duty cases.
+    /// Provides CRUD operations and persistence for LOD entities.
+    /// </summary>
     public interface ILodDataService
     {
         Task<InformalLineOfDuty> CreateNewCaseAsync(string caseNumber, string? memberId = null, string? memberName = null);

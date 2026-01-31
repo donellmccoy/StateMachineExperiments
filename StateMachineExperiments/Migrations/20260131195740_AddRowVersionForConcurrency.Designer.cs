@@ -11,8 +11,8 @@ using StateMachineExperiments.Common.Data;
 namespace StateMachineExperiments.Migrations
 {
     [DbContext(typeof(LodDbContext))]
-    [Migration("20260131012936_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260131195740_AddRowVersionForConcurrency")]
+    partial class AddRowVersionForConcurrency
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -20,10 +20,13 @@ namespace StateMachineExperiments.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.2");
 
-            modelBuilder.Entity("StateMachineExperiments.Models.LodCase", b =>
+            modelBuilder.Entity("StateMachineExperiments.Models.InformalLineOfDuty", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("AppealFiled")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("CaseNumber")
@@ -39,6 +42,12 @@ namespace StateMachineExperiments.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
+                    b.Property<decimal?>("EstimatedCost")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("InjurySeverity")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTime>("LastModifiedDate")
                         .HasColumnType("TEXT");
 
@@ -49,6 +58,17 @@ namespace StateMachineExperiments.Migrations
                     b.Property<string>("MemberName")
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("RequiresLegalReview")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("RequiresWingReview")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("BLOB");
 
                     b.HasKey("Id");
 
@@ -101,7 +121,7 @@ namespace StateMachineExperiments.Migrations
 
             modelBuilder.Entity("StateMachineExperiments.Models.StateTransitionHistory", b =>
                 {
-                    b.HasOne("StateMachineExperiments.Models.LodCase", "LodCase")
+                    b.HasOne("StateMachineExperiments.Models.InformalLineOfDuty", "LodCase")
                         .WithMany("TransitionHistory")
                         .HasForeignKey("LodCaseId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -110,7 +130,7 @@ namespace StateMachineExperiments.Migrations
                     b.Navigation("LodCase");
                 });
 
-            modelBuilder.Entity("StateMachineExperiments.Models.LodCase", b =>
+            modelBuilder.Entity("StateMachineExperiments.Models.InformalLineOfDuty", b =>
                 {
                     b.Navigation("TransitionHistory");
                 });

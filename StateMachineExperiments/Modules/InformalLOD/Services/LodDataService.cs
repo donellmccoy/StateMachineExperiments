@@ -1,12 +1,12 @@
 using Microsoft.EntityFrameworkCore;
-using StateMachineExperiments.Data;
-using StateMachineExperiments.Models;
+using StateMachineExperiments.Common.Data;
+using StateMachineExperiments.Modules.InformalLOD.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace StateMachineExperiments.Services
+namespace StateMachineExperiments.Modules.InformalLOD.Services
 {
     public class LodDataService : ILodDataService
     {

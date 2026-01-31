@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
-namespace StateMachineExperiments.Data
+namespace StateMachineExperiments.Common.Data
 {
     public class LodDbContextFactory : IDesignTimeDbContextFactory<LodDbContext>
     {

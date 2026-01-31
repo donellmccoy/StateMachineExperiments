@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using StateMachineExperiments.Models;
+using StateMachineExperiments.Modules.InformalLOD.Models;
 
-namespace StateMachineExperiments.Data
+namespace StateMachineExperiments.Common.Data
 {
     public class LodDbContext : DbContext
     {

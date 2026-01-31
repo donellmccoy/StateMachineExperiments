@@ -1,7 +1,11 @@
 using System;
 
-namespace StateMachineExperiments.Models
+namespace StateMachineExperiments.Modules.InformalLOD.Models
 {
+    /// <summary>
+    /// Represents a single state transition in a LOD case's history.
+    /// Provides an immutable audit trail of all state changes.
+    /// </summary>
     public class StateTransitionHistory
     {
         public int Id { get; set; }
