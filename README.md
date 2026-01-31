@@ -21,45 +21,53 @@ This project demonstrates a complete state machine implementation for managing A
 -  Multiple scenario demonstrations
 
 ## State Machine Workflow
+
 ```mermaid
 stateDiagram-v2
     [*] --> Start
-    Start --> MemberReports: ProcessInitiated
-    MemberReports --> LodInitiation: ConditionReported
-    LodInitiation --> MedicalAssessment: InitiationComplete
-    MedicalAssessment --> CommanderReview: AssessmentDone
+    Start --> MemberReports: TRIGGER: ProcessInitiated
+    MemberReports --> LodInitiation: TRIGGER: ConditionReported
+    LodInitiation --> MedicalAssessment: TRIGGER: InitiationComplete
+    MedicalAssessment --> CommanderReview: TRIGGER: AssessmentDone
     
-    CommanderReview --> OptionalLegal: ReviewFinished<br/>(Legal Review Required)
-    CommanderReview --> BoardAdjudication: ReviewFinished<br/>(No Optional Reviews)
+    CommanderReview --> OptionalLegal: TRIGGER: ReviewFinished<br/>(condition: true)
+    CommanderReview --> BoardAdjudication: TRIGGER: ReviewFinished<br/>(condition: false)
     
-    OptionalLegal --> OptionalWing: LegalDone<br/>(Wing Review Required)
-    OptionalLegal --> BoardAdjudication: LegalDone<br/>(Skip Wing Review)
+    OptionalLegal --> OptionalWing: TRIGGER: LegalDone<br/>(condition: true)
+    OptionalLegal --> BoardAdjudication: TRIGGER: LegalDone<br/>(condition: false)
     
-    OptionalWing --> BoardAdjudication: WingDone
+    OptionalWing --> BoardAdjudication: TRIGGER: WingDone
     
-    BoardAdjudication --> Determination: AdjudicationComplete
-    Determination --> Notification: DeterminationFinalized
+    BoardAdjudication --> Determination: TRIGGER: AdjudicationComplete
+    Determination --> Notification: TRIGGER: DeterminationFinalized
     
-    Notification --> Appeal: AppealRequested
-    Notification --> End: NoAppealRequested
+    Notification --> Appeal: TRIGGER: AppealRequested<br/>(condition: true)
+    Notification --> End: TRIGGER: NoAppealRequested<br/>(condition: false)
     
-    Appeal --> End: AppealResolved
+    Appeal --> End: TRIGGER: AppealResolved
     End --> [*]
     
-    note right of OptionalLegal
-        Optional reviews are<br/>conditionally executed<br/>based on case requirements
+    note left of Start
+        📦 STATES (boxes):<br/>Current position in workflow<br/>Examples: Start, MemberReports,<br/>CommanderReview, End
     end note
     
-    note right of Appeal
-        Appeal to HQ AFRC/CD<br/>if member requests<br/>within deadline
+    note right of OptionalLegal
+        ⚡ TRIGGERS (arrows):<br/>Events causing transitions<br/>Examples: ProcessInitiated,<br/>ReviewFinished, LegalDone
     end note
 ```
 
-### Workflow Summary
-1. **Start**  Member Reports  LOD Initiation  Medical Assessment
-2. **Commander Review**  Optional Legal Review (conditional)
-3. **Optional Wing Review** (conditional)  Board Adjudication
-4. **Determination**  Notification  Appeal (optional)  End
+### State Machine Components
+
+**States** (Boxes in diagram):
+- `Start`, `MemberReports`, `LodInitiation`, `MedicalAssessment`
+- `CommanderReview`, `OptionalLegal`, `OptionalWing`
+- `BoardAdjudication`, `Determination`, `Notification`, `Appeal`, `End`
+
+**Triggers** (Arrow labels in diagram):
+- `ProcessInitiated`, `ConditionReported`, `InitiationComplete`
+- `AssessmentDone`, `ReviewFinished`, `LegalDone`, `WingDone`
+- `AdjudicationComplete`, `DeterminationFinalized`
+- `AppealRequested`, `NoAppealRequested`, `AppealResolved`
 
 ## Getting Started
 
