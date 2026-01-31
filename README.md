@@ -23,64 +23,104 @@ This project demonstrates a complete state machine implementation for managing A
 ## State Machine Workflow
 
 ```mermaid
-%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#0066cc','primaryTextColor':'#fff','primaryBorderColor':'#004999','lineColor':'#666','secondaryColor':'#28a745','tertiaryColor':'#ffc107'}}}%%
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#FFB84D','primaryTextColor':'#000','primaryBorderColor':'#E69500','lineColor':'#333','secondaryColor':'#5DCCCC','tertiaryColor':'#FF6B9D','fontSize':'16px'}}}%%
 stateDiagram-v2
     direction TB
     
     [*] --> Start
     
-    Start --> MemberReports:    Process Initiated    
-    MemberReports --> LodInitiation:    Condition Reported    
-    LodInitiation --> MedicalAssessment:    Initiation Complete    
-    MedicalAssessment --> CommanderReview:    Assessment Done    
+    state "    Read Card    " as Start {
+    }
     
-    CommanderReview --> OptionalLegal:    Review Finished    
-    CommanderReview --> BoardAdjudication:    Review Finished (fast-track)    
+    state "    Member Reports    " as MemberReports {
+    }
     
-    OptionalLegal --> OptionalWing:    Legal Done    
-    OptionalLegal --> BoardAdjudication:    Legal Done    
+    state "    LOD Initiation    " as LodInitiation {
+    }
     
-    OptionalWing --> BoardAdjudication:    Wing Done    
+    state "    Medical Assessment    " as MedicalAssessment {
+    }
     
-    BoardAdjudication --> Determination:    Adjudication Complete    
-    Determination --> Notification:    Determination Finalized    
+    state "    Commander Review    " as CommanderReview {
+    }
     
-    Notification --> Appeal:    Appeal Requested    
-    Notification --> End:    No Appeal Requested    
+    state "    Legal Review    " as OptionalLegal {
+    }
+    
+    state "    Wing Review    " as OptionalWing {
+    }
+    
+    state "    Board Adjudication    " as BoardAdjudication {
+    }
+    
+    state "    Determination    " as Determination {
+    }
+    
+    state "    Notification    " as Notification {
+    }
+    
+    state "    Appeal    " as Appeal {
+    }
+    
+    state "    Eject Card    " as End {
+    }
+    
+    Start --> MemberReports:    Valid Card    
+    Start --> End:    Invalid Card    
+    
+    MemberReports --> LodInitiation:    Report Submitted    
+    
+    LodInitiation --> MedicalAssessment:    Case Opened    
+    LodInitiation --> End:    Incomplete Info    
+    
+    MedicalAssessment --> CommanderReview:    Assessment Complete    
+    
+    state decision1 <<choice>>
+    CommanderReview --> decision1:    Review Complete    
+    decision1 --> OptionalLegal:    Legal Review Needed    
+    decision1 --> BoardAdjudication:    Fast Track    
+    
+    state decision2 <<choice>>
+    OptionalLegal --> decision2:    Legal Review Done    
+    decision2 --> OptionalWing:    Wing Review Needed    
+    decision2 --> BoardAdjudication:    Proceed to Board    
+    
+    OptionalWing --> BoardAdjudication:    Wing Approved    
+    
+    BoardAdjudication --> Determination:    Board Decision    
+    
+    Determination --> Notification:    Determination Made    
+    
+    state decision3 <<choice>>
+    Notification --> decision3:    Member Notified    
+    decision3 --> Appeal:    Appeal Filed    
+    decision3 --> End:    No Appeal    
     
     Appeal --> End:    Appeal Resolved    
+    
     End --> [*]
     
-    state "    Start    " as Start
-    state "    Member Reports    " as MemberReports
-    state "    LOD Initiation    " as LodInitiation
-    state "    Medical Assessment    " as MedicalAssessment
-    state "    Commander Review    " as CommanderReview
-    state "    Legal Review    " as OptionalLegal
-    state "    Wing Review    " as OptionalWing
-    state "    Board Adjudication    " as BoardAdjudication
-    state "    Determination    " as Determination
-    state "    Notification    " as Notification
-    state "    Appeal    " as Appeal
-    state "    End    " as End
+    classDef entry fill:#FFB84D,stroke:#E69500,stroke-width:3px,color:#000
+    classDef process fill:#5DCCCC,stroke:#3AAFAF,stroke-width:2px,color:#000
+    classDef optional fill:#FF6B9D,stroke:#E5558A,stroke-width:2px,color:#000
+    classDef decision fill:#B19CD9,stroke:#9A7FC7,stroke-width:2px,color:#000
+    classDef complete fill:#FF6B6B,stroke:#E55555,stroke-width:3px,color:#fff
     
-    classDef optional fill:#ffc107,stroke:#ff9800,stroke-width:3px,color:#000
-    classDef required fill:#0066cc,stroke:#004999,stroke-width:2px,color:#fff
-    classDef decision fill:#28a745,stroke:#1e7e34,stroke-width:2px,color:#fff
-    classDef terminal fill:#6c757d,stroke:#495057,stroke-width:2px,color:#fff
-    
-    class OptionalLegal,OptionalWing optional
-    class MemberReports,LodInitiation,MedicalAssessment,BoardAdjudication,Determination,Notification required
-    class CommanderReview,Appeal decision
-    class Start,End terminal
+    class Start,MemberReports entry
+    class LodInitiation,MedicalAssessment,BoardAdjudication,Determination,Notification process
+    class CommanderReview,OptionalLegal,OptionalWing optional
+    class Appeal decision
+    class End complete
 ```
 
 ### Legend
 
-- 🔵 **Blue**: Required workflow states
-- 🟢 **Green**: Decision points with branching logic
-- 🟡 **Yellow**: Optional review states (conditional)
-- ⚫ **Gray**: Terminal states (start/end)
+- 🟠 **Orange**: Entry states (card read, member reporting)
+- 🔵 **Cyan**: Required processing states
+- 💗 **Pink**: Optional review states (conditional paths)
+- 🟣 **Purple**: Appeal/decision handling
+- 🔴 **Red**: Terminal state (case closed)
+- ◆ **Diamond**: Decision points (branching logic)
 
 ### Workflow Phases
 
