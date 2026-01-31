@@ -29,42 +29,6 @@ stateDiagram-v2
     
     [*] --> Start
     
-    state "    Read Card    " as Start {
-    }
-    
-    state "    Member Reports    " as MemberReports {
-    }
-    
-    state "    LOD Initiation    " as LodInitiation {
-    }
-    
-    state "    Medical Assessment    " as MedicalAssessment {
-    }
-    
-    state "    Commander Review    " as CommanderReview {
-    }
-    
-    state "    Legal Review    " as OptionalLegal {
-    }
-    
-    state "    Wing Review    " as OptionalWing {
-    }
-    
-    state "    Board Adjudication    " as BoardAdjudication {
-    }
-    
-    state "    Determination    " as Determination {
-    }
-    
-    state "    Notification    " as Notification {
-    }
-    
-    state "    Appeal    " as Appeal {
-    }
-    
-    state "    Eject Card    " as End {
-    }
-    
     Start --> MemberReports:    Valid Card    
     Start --> End:    Invalid Card    
     
@@ -99,6 +63,19 @@ stateDiagram-v2
     Appeal --> End:    Appeal Resolved    
     
     End --> [*]
+    
+    state "    Start    " as Start
+    state "    Member Reports    " as MemberReports
+    state "    LOD Initiation    " as LodInitiation
+    state "    Medical Assessment    " as MedicalAssessment
+    state "    Commander Review    " as CommanderReview
+    state "    Legal Review    " as OptionalLegal
+    state "    Wing Review    " as OptionalWing
+    state "    Board Adjudication    " as BoardAdjudication
+    state "    Determination    " as Determination
+    state "    Notification    " as Notification
+    state "    Appeal    " as Appeal
+    state "    End    " as End
     
     classDef entry fill:#FFB84D,stroke:#E69500,stroke-width:3px,color:#000
     classDef process fill:#5DCCCC,stroke:#3AAFAF,stroke-width:2px,color:#000
