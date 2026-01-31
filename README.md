@@ -29,40 +29,40 @@ stateDiagram-v2
     
     [*] --> Start
     
-    Start --> MemberReports: Process Initiated
-    MemberReports --> LodInitiation: Condition Reported
-    LodInitiation --> MedicalAssessment: Initiation Complete
-    MedicalAssessment --> CommanderReview: Assessment Done
+    Start --> MemberReports:   Process Initiated   
+    MemberReports --> LodInitiation:   Condition Reported   
+    LodInitiation --> MedicalAssessment:   Initiation Complete   
+    MedicalAssessment --> CommanderReview:   Assessment Done   
     
-    CommanderReview --> OptionalLegal: Review Finished
-    CommanderReview --> BoardAdjudication: Review Finished (fast-track)
+    CommanderReview --> OptionalLegal:   Review Finished   
+    CommanderReview --> BoardAdjudication:   Review Finished (fast-track)   
     
-    OptionalLegal --> OptionalWing: Legal Done
-    OptionalLegal --> BoardAdjudication: Legal Done
+    OptionalLegal --> OptionalWing:   Legal Done   
+    OptionalLegal --> BoardAdjudication:   Legal Done   
     
-    OptionalWing --> BoardAdjudication: Wing Done
+    OptionalWing --> BoardAdjudication:   Wing Done   
     
-    BoardAdjudication --> Determination: Adjudication Complete
-    Determination --> Notification: Determination Finalized
+    BoardAdjudication --> Determination:   Adjudication Complete   
+    Determination --> Notification:   Determination Finalized   
     
-    Notification --> Appeal: Appeal Requested
-    Notification --> End: No Appeal Requested
+    Notification --> Appeal:   Appeal Requested   
+    Notification --> End:   No Appeal Requested   
     
-    Appeal --> End: Appeal Resolved
+    Appeal --> End:   Appeal Resolved   
     End --> [*]
     
-    state "⚫  Start  ⚫" as Start
-    state "📝  Member Reports" as MemberReports
-    state "🚀  LOD Initiation" as LodInitiation
-    state "🏥  Medical Assessment" as MedicalAssessment
-    state "👔  Commander Review" as CommanderReview
-    state "⚖️  Legal Review" as OptionalLegal
-    state "🎖️  Wing Review" as OptionalWing
-    state "👥  Board Adjudication" as BoardAdjudication
-    state "✅  Determination" as Determination
-    state "📢  Notification" as Notification
-    state "📋  Appeal" as Appeal
-    state "⚫  End  ⚫" as End
+    state "   Start   " as Start
+    state "   Member Reports   " as MemberReports
+    state "   LOD Initiation   " as LodInitiation
+    state "   Medical Assessment   " as MedicalAssessment
+    state "   Commander Review   " as CommanderReview
+    state "   Legal Review   " as OptionalLegal
+    state "   Wing Review   " as OptionalWing
+    state "   Board Adjudication   " as BoardAdjudication
+    state "   Determination   " as Determination
+    state "   Notification   " as Notification
+    state "   Appeal   " as Appeal
+    state "   End   " as End
     
     classDef optional fill:#ffc107,stroke:#ff9800,stroke-width:3px,color:#000
     classDef required fill:#0066cc,stroke:#004999,stroke-width:2px,color:#fff
