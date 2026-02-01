@@ -24,7 +24,7 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
                 CaseNumber = caseNumber,
                 MemberId = memberId,
                 MemberName = memberName,
-                CurrentState = nameof(LodState.Start),
+                CurrentState = LodState.Start,
                 CreatedDate = DateTime.UtcNow,
                 LastModifiedDate = DateTime.UtcNow
             });

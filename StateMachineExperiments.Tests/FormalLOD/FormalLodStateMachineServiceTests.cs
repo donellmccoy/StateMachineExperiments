@@ -26,7 +26,8 @@ namespace StateMachineExperiments.Tests.FormalLOD
             _mockDataService = new Mock<IFormalLodDataService>();
             _mockBusinessRules = new Mock<IFormalLodBusinessRuleService>();
             _mockValidator = new Mock<IFormalLodTransitionValidator>();
-            _notificationService = new NotificationService();
+            var mockSmtpService = new Mock<ISmtpService>();
+            _notificationService = new NotificationService(mockSmtpService.Object);
             _stateMachineFactory = new FormalLodStateMachineFactory(_notificationService);
 
             _service = new FormalLodStateMachineService(
@@ -52,7 +53,7 @@ namespace StateMachineExperiments.Tests.FormalLOD
                 MemberId = memberId,
                 MemberName = memberName,
                 IsDeathCase = isDeathCase,
-                CurrentState = nameof(FormalLodState.Start)
+                CurrentState = FormalLodState.Start
             };
 
             _mockDataService
@@ -79,7 +80,7 @@ namespace StateMachineExperiments.Tests.FormalLOD
             {
                 Id = 1,
                 CaseNumber = "FORMAL-001",
-                CurrentState = nameof(FormalLodState.Start),
+                CurrentState = FormalLodState.Start,
                 TransitionHistory = new List<FormalStateTransitionHistory>()
             };
 
@@ -94,7 +95,7 @@ namespace StateMachineExperiments.Tests.FormalLOD
 
             // Assert
             _mockDataService.Verify(x => x.UpdateCaseAsync(
-                It.Is<FormalLineOfDuty>(c => c.CurrentState == nameof(FormalLodState.MemberReports))), Times.Once);
+                It.Is<FormalLineOfDuty>(c => c.CurrentState == FormalLodState.MemberReports)), Times.Once);
             _mockDataService.Verify(x => x.AddTransitionHistoryAsync(It.IsAny<FormalStateTransitionHistory>()), Times.Once);
         }
 
@@ -108,7 +109,7 @@ namespace StateMachineExperiments.Tests.FormalLOD
             {
                 Id = 1,
                 CaseNumber = "FORMAL-001",
-                CurrentState = currentState.ToString(),
+                CurrentState = currentState,
                 TransitionHistory = new List<FormalStateTransitionHistory>()
             };
 
@@ -140,7 +141,7 @@ namespace StateMachineExperiments.Tests.FormalLOD
             {
                 Id = 1,
                 CaseNumber = "FORMAL-001",
-                CurrentState = nameof(FormalLodState.Investigation),
+                CurrentState = FormalLodState.Investigation,
                 ToxicologyRequired = true,
                 ToxicologyComplete = false,
                 TransitionHistory = new List<FormalStateTransitionHistory>()
@@ -168,7 +169,7 @@ namespace StateMachineExperiments.Tests.FormalLOD
             {
                 Id = 1,
                 CaseNumber = "FORMAL-001",
-                CurrentState = state.ToString(),
+                CurrentState = state,
                 TransitionHistory = new List<FormalStateTransitionHistory>()
             };
 
@@ -202,7 +203,7 @@ namespace StateMachineExperiments.Tests.FormalLOD
             {
                 Id = 1,
                 CaseNumber = "FORMAL-001",
-                CurrentState = nameof(FormalLodState.Investigation)
+                CurrentState = FormalLodState.Investigation
             };
 
             _mockDataService.Setup(x => x.GetCaseAsync(1)).ReturnsAsync(expectedCase);
@@ -223,7 +224,7 @@ namespace StateMachineExperiments.Tests.FormalLOD
             {
                 Id = 1,
                 CaseNumber = "FORMAL-001",
-                CurrentState = nameof(FormalLodState.Investigation)
+                CurrentState = FormalLodState.Investigation
             };
 
             _mockDataService.Setup(x => x.GetCaseByCaseNumberAsync("FORMAL-001")).ReturnsAsync(expectedCase);
@@ -269,7 +270,7 @@ namespace StateMachineExperiments.Tests.FormalLOD
             {
                 Id = 1,
                 CaseNumber = "FORMAL-001",
-                CurrentState = nameof(FormalLodState.Start)
+                CurrentState = FormalLodState.Start
             };
 
             _mockDataService.Setup(x => x.GetCaseAsync(1)).ReturnsAsync(lodCase);

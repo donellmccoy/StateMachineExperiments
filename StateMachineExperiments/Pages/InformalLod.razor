@@ -1,0 +1,96 @@
+@page "/informal-lod"
+
+<PageTitle>Informal LOD Cases</PageTitle>
+
+<div class="card">
+    <h1>📋 Informal Line of Duty Cases</h1>
+    <p>Manage informal LOD cases with a complete workflow process.</p>
+</div>
+
+@if (isLoading)
+{
+    <div class="loading">
+        <p>Loading...</p>
+    </div>
+}
+else
+{
+    <div class="card">
+        <h2>Create New Case</h2>
+        <div class="form-group">
+            <label>Case Number</label>
+            <input type="text" @bind="newCaseNumber" placeholder="Enter case number (e.g. LOD-2026-001)" />
+        </div>
+        <div class="form-group">
+            <label>Member ID</label>
+            <input type="text" @bind="newMemberId" placeholder="Enter member ID" />
+        </div>
+        <div class="form-group">
+            <label>Member Name</label>
+            <input type="text" @bind="newMemberName" placeholder="Enter member name" />
+        </div>
+        <button class="btn btn-success" @onclick="CreateNewCase">Create Case</button>
+    </div>
+
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <div class="alert @messageClass">
+            @message
+        </div>
+    }
+
+    @if (selectedCase != null)
+    {
+        <div class="card">
+            <h2>Case: @selectedCase.CaseNumber</h2>
+            <p><strong>Current State:</strong> <span class="state-badge state-progress">@selectedCase.CurrentState</span></p>
+            <p><strong>Member:</strong> @selectedCase.MemberName (@selectedCase.MemberId)</p>
+            <p><strong>Created:</strong> @selectedCase.CreatedDate.ToString("g")</p>
+
+            <h3>Available Triggers</h3>
+            @if (permittedTriggers.Any())
+            {
+                <div>
+                    @foreach (var trigger in permittedTriggers)
+                    {
+                        <button class="btn" @onclick="() => FireTrigger(trigger)">@trigger</button>
+                    }
+                </div>
+            }
+            else
+            {
+                <p>No available actions in current state.</p>
+            }
+
+            <h3>Transition History</h3>
+            @if (caseHistory.Any())
+            {
+                <table class="transition-history">
+                    <thead>
+                        <tr>
+                            <th>From State</th>
+                            <th>To State</th>
+                            <th>Trigger</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var transition in caseHistory.OrderByDescending(t => t.Timestamp))
+                        {
+                            <tr>
+                                <td>@transition.FromState</td>
+                                <td>@transition.ToState</td>
+                                <td>@transition.Trigger</td>
+                                <td>@transition.Timestamp.ToString("g")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>No transitions yet.</p>
+            }
+        </div>
+    }
+}

@@ -1,5 +1,42 @@
+using System.Threading.Tasks;
+
 namespace StateMachineExperiments.Common.Infrastructure
 {
+    /// <summary>
+    /// Request for sending a determination notification to a member.
+    /// </summary>
+    public class DeterminationNotificationRequest
+    {
+        public required string CaseNumber { get; init; }
+        public required string MemberId { get; init; }
+        public required string MemberName { get; init; }
+        public required string Determination { get; init; }
+        public required int AppealWindowDays { get; init; }
+        public string NotificationType { get; init; } = "Email";
+    }
+
+    /// <summary>
+    /// Request for sending a general notification.
+    /// </summary>
+    public class NotificationRequest
+    {
+        public required string Recipient { get; init; }
+        public required string Subject { get; init; }
+        public required string Message { get; init; }
+        public string NotificationType { get; init; } = "Email";
+    }
+
+    /// <summary>
+    /// Request for sending a stakeholder alert.
+    /// </summary>
+    public class StakeholderAlertRequest
+    {
+        public required string CaseNumber { get; init; }
+        public required string AlertType { get; init; }
+        public required string Message { get; init; }
+        public required string[] Stakeholders { get; init; }
+    }
+
     /// <summary>
     /// Service for sending notifications to members and stakeholders.
     /// </summary>
@@ -8,44 +45,16 @@ namespace StateMachineExperiments.Common.Infrastructure
         /// <summary>
         /// Sends a notification to a member with determination results.
         /// </summary>
-        /// <param name="caseNumber">The LOD case number</param>
-        /// <param name="memberId">The member's ID</param>
-        /// <param name="memberName">The member's name</param>
-        /// <param name="determination">The LOD determination result</param>
-        /// <param name="appealWindowDays">Number of days member has to appeal</param>
-        /// <param name="notificationType">Type of notification (e.g., Email, Letter)</param>
-        void SendDeterminationNotification(
-            string caseNumber,
-            string memberId,
-            string memberName,
-            string determination,
-            int appealWindowDays,
-            string notificationType = "Email");
+        Task NotifyDeterminationAsync(DeterminationNotificationRequest request);
 
         /// <summary>
         /// Sends a general notification.
         /// </summary>
-        /// <param name="recipient">The notification recipient</param>
-        /// <param name="subject">The notification subject</param>
-        /// <param name="message">The notification message</param>
-        /// <param name="notificationType">Type of notification (e.g., Email, SMS)</param>
-        void SendNotification(
-            string recipient,
-            string subject,
-            string message,
-            string notificationType = "Email");
+        Task NotifyAsync(NotificationRequest request);
 
         /// <summary>
-        /// Sends an alert to stakeholders (e.g., death case notifications).
+        /// Sends an alert to stakeholders.
         /// </summary>
-        /// <param name="caseNumber">The LOD case number</param>
-        /// <param name="alertType">Type of alert</param>
-        /// <param name="message">Alert message</param>
-        /// <param name="stakeholders">List of stakeholder identifiers</param>
-        void SendStakeholderAlert(
-            string caseNumber,
-            string alertType,
-            string message,
-            params string[] stakeholders);
+        Task AlertStakeholdersAsync(StakeholderAlertRequest request);
     }
 }

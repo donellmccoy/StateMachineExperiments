@@ -19,13 +19,10 @@ namespace StateMachineExperiments.Modules.FormalLOD.Services
         {
             var errors = new List<string>();
 
-            // Validate based on trigger and current state
-            var currentState = System.Enum.Parse<FormalLodState>(lodCase.CurrentState);
-
             switch (trigger)
             {
                 case FormalLodTrigger.ProcessInitiated:
-                    if (currentState != FormalLodState.Start)
+                    if (lodCase.CurrentState != FormalLodState.Start)
                         errors.Add("Process can only be initiated from Start state");
                     break;
 
@@ -57,7 +54,7 @@ namespace StateMachineExperiments.Modules.FormalLOD.Services
                     break;
 
                 case FormalLodTrigger.NoAppealRequested:
-                    if (currentState != FormalLodState.Notification)
+                    if (lodCase.CurrentState != FormalLodState.Notification)
                         errors.Add("Can only close without appeal from Notification state");
                     break;
             }

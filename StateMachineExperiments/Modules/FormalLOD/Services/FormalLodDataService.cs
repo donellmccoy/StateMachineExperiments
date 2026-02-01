@@ -25,7 +25,7 @@ namespace StateMachineExperiments.Modules.FormalLOD.Services
                 MemberId = memberId,
                 MemberName = memberName,
                 IsDeathCase = isDeathCase,
-                CurrentState = nameof(FormalLodState.Start),
+                CurrentState = FormalLodState.Start,
                 CreatedDate = DateTime.UtcNow,
                 LastModifiedDate = DateTime.UtcNow
             });

@@ -1,0 +1,57 @@
+@page "/"
+
+<PageTitle>State Machine Experiments - Home</PageTitle>
+
+<div class="card">
+    <h1>🎯 State Machine Experiments</h1>
+    <h2>Line of Duty (LOD) Case Management System</h2>
+
+    <div class="alert alert-info">
+        <strong>Welcome!</strong> This application demonstrates a modular state machine architecture for managing Line of Duty cases.
+    </div>
+
+    <h3>Features</h3>
+    <ul>
+        <li><strong>Informal LOD Workflow</strong> - Simplified process for straightforward cases</li>
+        <li><strong>Formal LOD Workflow</strong> - Comprehensive process with medical reviews and appeals</li>
+        <li><strong>State Machine Pattern</strong> - Using the Stateless library for robust workflow management</li>
+        <li><strong>Entity Framework Core</strong> - In-memory database for case persistence</li>
+        <li><strong>Async Operations</strong> - Non-blocking state transitions and notifications</li>
+    </ul>
+
+    <h3>Quick Start</h3>
+    <div class="card">
+        <p><strong>Navigate to:</strong></p>
+        <ul>
+            <li><a href="/informal-lod"><strong>Informal LOD</strong></a> - Create and manage informal Line of Duty cases</li>
+            <li><a href="/formal-lod"><strong>Formal LOD</strong></a> - Create and manage formal Line of Duty cases with appeals</li>
+        </ul>
+    </div>
+
+    <h3>Architecture Highlights</h3>
+    <div class="card">
+        <h4>Modular Design</h4>
+        <p>Each workflow module is self-contained with its own:</p>
+        <ul>
+            <li>Domain Models (State enums, entities)</li>
+            <li>Services (Data access, business rules, state machine management)</li>
+            <li>Events (Domain events for state transitions)</li>
+        </ul>
+
+        <h4>Type-Safe State Management</h4>
+        <p>Enum-based states eliminate string parsing and provide compile-time safety:</p>
+        <ul>
+            <li>LodState / FormalLodState (state enums)</li>
+            <li>LodTrigger / FormalLodTrigger (trigger enums)</li>
+            <li>Direct enum comparisons throughout the codebase</li>
+        </ul>
+
+        <h4>Async Event Handling</h4>
+        <p>All state machine callbacks use async patterns:</p>
+        <ul>
+            <li>OnEntryAsync for state entry actions</li>
+            <li>OnExitAsync for state exit actions</li>
+            <li>Non-blocking notification service integration</li>
+        </ul>
+    </div>
+</div>

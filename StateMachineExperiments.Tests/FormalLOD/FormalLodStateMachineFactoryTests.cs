@@ -1,6 +1,7 @@
 using StateMachineExperiments.Common.Infrastructure;
 using StateMachineExperiments.Modules.FormalLOD.Models;
 using StateMachineExperiments.Modules.FormalLOD.Services;
+using Moq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,8 @@ namespace StateMachineExperiments.Tests.FormalLOD
 
         public FormalLodStateMachineFactoryTests()
         {
-            _notificationService = new NotificationService();
+            var mockSmtpService = new Mock<ISmtpService>();
+            _notificationService = new NotificationService(mockSmtpService.Object);
             _factory = new FormalLodStateMachineFactory(_notificationService);
         }
 
@@ -28,12 +30,12 @@ namespace StateMachineExperiments.Tests.FormalLOD
             {
                 Id = 1,
                 CaseNumber = "FORMAL-001",
-                CurrentState = state.ToString(),
+                CurrentState = state,
                 TransitionHistory = new List<FormalStateTransitionHistory>()
             };
 
             // Act
-            var stateMachine = _factory.CreateStateMachine(lodCase, _eventPublisher);
+            var stateMachine = _factory.CreateStateMachine(lodCase);
 
             // Assert
             Assert.NotNull(stateMachine);
@@ -50,12 +52,12 @@ namespace StateMachineExperiments.Tests.FormalLOD
             {
                 Id = 1,
                 CaseNumber = "FORMAL-001",
-                CurrentState = state.ToString(),
+                CurrentState = state,
                 TransitionHistory = new List<FormalStateTransitionHistory>()
             };
 
             // Act
-            var stateMachine = _factory.CreateStateMachine(lodCase, _eventPublisher);
+            var stateMachine = _factory.CreateStateMachine(lodCase);
             var permittedTriggers = stateMachine.PermittedTriggers.ToList();
 
             // Assert
@@ -72,12 +74,12 @@ namespace StateMachineExperiments.Tests.FormalLOD
             // Arrange
             var lodCase = new FormalLineOfDuty
             {
-                CurrentState = nameof(FormalLodState.Start),
+                CurrentState = FormalLodState.Start,
                 TransitionHistory = new List<FormalStateTransitionHistory>()
             };
 
             // Act
-            var stateMachine = _factory.CreateStateMachine(lodCase, _eventPublisher);
+            var stateMachine = _factory.CreateStateMachine(lodCase);
             var permittedTriggers = stateMachine.PermittedTriggers.ToList();
 
             // Assert
@@ -91,12 +93,12 @@ namespace StateMachineExperiments.Tests.FormalLOD
             // Arrange
             var lodCase = new FormalLineOfDuty
             {
-                CurrentState = nameof(FormalLodState.End),
+                CurrentState = FormalLodState.End,
                 TransitionHistory = new List<FormalStateTransitionHistory>()
             };
 
             // Act
-            var stateMachine = _factory.CreateStateMachine(lodCase, _eventPublisher);
+            var stateMachine = _factory.CreateStateMachine(lodCase);
             var permittedTriggers = stateMachine.PermittedTriggers.ToList();
 
             // Assert
@@ -109,12 +111,12 @@ namespace StateMachineExperiments.Tests.FormalLOD
             // Arrange
             var lodCase = new FormalLineOfDuty
             {
-                CurrentState = nameof(FormalLodState.Notification),
+                CurrentState = FormalLodState.Notification,
                 TransitionHistory = new List<FormalStateTransitionHistory>()
             };
 
             // Act
-            var stateMachine = _factory.CreateStateMachine(lodCase, _eventPublisher);
+            var stateMachine = _factory.CreateStateMachine(lodCase);
             var permittedTriggers = stateMachine.PermittedTriggers.ToList();
 
             // Assert
@@ -131,53 +133,17 @@ namespace StateMachineExperiments.Tests.FormalLOD
             // Arrange
             var lodCase = new FormalLineOfDuty
             {
-                CurrentState = nameof(FormalLodState.Start),
+                CurrentState = FormalLodState.Start,
                 IsDeathCase = isDeathCase,
                 TransitionHistory = new List<FormalStateTransitionHistory>()
             };
 
             // Act
-            var stateMachine = _factory.CreateStateMachine(lodCase, _eventPublisher);
+            var stateMachine = _factory.CreateStateMachine(lodCase);
 
             // Assert
-            Assert.NotNull(stateMachine);
+  Assert.NotNull(stateMachine);
             Assert.Equal(FormalLodState.Start, stateMachine.State);
-        }
-
-        [Fact]
-        public void CreateStateMachine_WithNotificationService_ShouldAcceptNotificationService()
-        {
-            // Arrange
-            var lodCase = new FormalLineOfDuty
-            {
-                CurrentState = nameof(FormalLodState.Start),
-                TransitionHistory = new List<FormalStateTransitionHistory>()
-            };
-
-            var notificationService = new NotificationService();
-
-            // Act
-            var stateMachine = _factory.CreateStateMachine(lodCase, notificationService);
-
-            // Assert
-            Assert.NotNull(stateMachine);
-        }
-
-        [Fact]
-        public void CreateStateMachine_WithNullNotificationService_ShouldCreateValidStateMachine()
-        {
-            // Arrange
-            var lodCase = new FormalLineOfDuty
-            {
-                CurrentState = nameof(FormalLodState.Start),
-                TransitionHistory = new List<FormalStateTransitionHistory>()
-            };
-
-            // Act
-            var stateMachine = _factory.CreateStateMachine(lodCase, null);
-
-            // Assert
-            Assert.NotNull(stateMachine);
         }
     }
 

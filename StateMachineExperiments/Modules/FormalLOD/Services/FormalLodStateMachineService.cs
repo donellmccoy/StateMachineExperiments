@@ -54,11 +54,13 @@ namespace StateMachineExperiments.Modules.FormalLOD.Services
             var lodCase = await _dataService.CreateNewCaseAsync(caseNumber, memberId, memberName, isDeathCase);
 
             // Send notification to stakeholders
-            _notificationService.SendStakeholderAlert(
-                caseNumber: caseNumber,
-                alertType: "New LOD Case Created",
-                message: $"New {(isDeathCase ? "DEATH" : "formal")} LOD case {caseNumber} created for {memberName ?? "member"} ({memberId ?? "N/A"})",
-                stakeholders: new[] { "LOD Manager", "Wing Commander" });
+            await _notificationService.AlertStakeholdersAsync(new StakeholderAlertRequest
+            {
+                CaseNumber = caseNumber,
+                AlertType = "New LOD Case Created",
+                Message = $"New {(isDeathCase ? "DEATH" : "formal")} LOD case {caseNumber} created for {memberName ?? "member"} ({memberId ?? "N/A"})",
+                Stakeholders = new[] { "LOD Manager", "Wing Commander" }
+            });
 
             return lodCase;
         }
@@ -84,18 +86,17 @@ namespace StateMachineExperiments.Modules.FormalLOD.Services
                 throw new TransitionValidationException(string.Join("; ", validationResult.Errors));
             }
 
-            var currentState = Enum.Parse<FormalLodState>(lodCase.CurrentState);
-            var stateMachine = _stateMachineFactory.CreateStateMachine(lodCase, _notificationService);
+            var stateMachine = _stateMachineFactory.CreateStateMachine(lodCase);
 
             if (!stateMachine.CanFire(trigger))
             {
                 var permitted = (await stateMachine.PermittedTriggersAsync).Select(t => t.ToString()).ToArray();
-                throw new InvalidStateTransitionException(currentState.ToString(), trigger.ToString(), permitted);
+                throw new InvalidStateTransitionException(lodCase.CurrentState.ToString(), trigger.ToString(), permitted);
             }
 
             var fromState = lodCase.CurrentState;
             await stateMachine.FireAsync(trigger);
-            var toState = stateMachine.State.ToString();
+            var toState = stateMachine.State;
 
             // Update case state
             lodCase.CurrentState = toState;
@@ -103,12 +104,12 @@ namespace StateMachineExperiments.Modules.FormalLOD.Services
             await _dataService.UpdateCaseAsync(lodCase);
 
             // Record transition
-            var authority = GetCurrentAuthority(Enum.Parse<FormalLodState>(toState));
+            var authority = GetCurrentAuthority(toState);
             await _dataService.AddTransitionHistoryAsync(new FormalStateTransitionHistory
             {
                 FormalLodCaseId = caseId,
-                FromState = fromState,
-                ToState = toState,
+                FromState = fromState.ToString(),
+                ToState = toState.ToString(),
                 Trigger = trigger.ToString(),
                 Timestamp = DateTime.UtcNow,
                 PerformedByAuthority = authority,
@@ -116,11 +117,13 @@ namespace StateMachineExperiments.Modules.FormalLOD.Services
             });
 
             // Send notification about state change
-            _notificationService.SendNotification(
-                recipient: "LOD Manager",
-                subject: $"State Transition - Case {lodCase.CaseNumber}",
-                message: $"Case {lodCase.CaseNumber} transitioned from {fromState} to {toState} via trigger {trigger}. Authority: {authority}",
-                notificationType: "System");
+            await _notificationService.NotifyAsync(new NotificationRequest
+            {
+                Recipient = "LOD Manager",
+                Subject = $"State Transition - Case {lodCase.CaseNumber}",
+                Message = $"Case {lodCase.CaseNumber} transitioned from {fromState} to {toState} via trigger {trigger}. Authority: {authority}",
+                NotificationType = "System"
+            });
 
             Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] Transition: {fromState} -> {toState} | Trigger: {trigger}");
         }
@@ -139,7 +142,7 @@ namespace StateMachineExperiments.Modules.FormalLOD.Services
                 return [];
             }
 
-            var stateMachine = _stateMachineFactory.CreateStateMachine(lodCase, _notificationService);
+            var stateMachine = _stateMachineFactory.CreateStateMachine(lodCase);
             return [.. (await stateMachine.PermittedTriggersAsync).Select(t => t.ToString())];
         }
 

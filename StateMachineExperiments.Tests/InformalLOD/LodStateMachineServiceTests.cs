@@ -25,7 +25,8 @@ namespace StateMachineExperiments.Tests.InformalLOD
             _mockDataService = new Mock<ILodDataService>();
             _mockBusinessRules = new Mock<ILodBusinessRuleService>();
             _mockValidator = new Mock<ILodTransitionValidator>();
-            _notificationService = new NotificationService();
+            var mockSmtpService = new Mock<ISmtpService>();
+            _notificationService = new NotificationService(mockSmtpService.Object);
             _stateMachineFactory = new LodStateMachineFactory(_notificationService);
 
             _service = new LodStateMachineService(
@@ -46,7 +47,7 @@ namespace StateMachineExperiments.Tests.InformalLOD
                 CaseNumber = "TEST-001",
                 MemberId = "M123",
                 MemberName = "Test User",
-                CurrentState = nameof(LodState.Start)
+                CurrentState = LodState.Start
             };
 
             _mockDataService
@@ -70,7 +71,7 @@ namespace StateMachineExperiments.Tests.InformalLOD
             {
                 Id = 1,
                 CaseNumber = "TEST-001",
-                CurrentState = nameof(LodState.Start),
+                CurrentState = LodState.Start,
                 TransitionHistory = new List<StateTransitionHistory>()
             };
 
@@ -84,7 +85,7 @@ namespace StateMachineExperiments.Tests.InformalLOD
             await _service.FireTriggerAsync(1, LodTrigger.ProcessInitiated);
 
             // Assert
-            _mockDataService.Verify(x => x.UpdateCaseAsync(It.Is<InformalLineOfDuty>(c => c.CurrentState == nameof(LodState.MemberReports))), Times.Once);
+            _mockDataService.Verify(x => x.UpdateCaseAsync(It.Is<InformalLineOfDuty>(c => c.CurrentState == LodState.MemberReports)), Times.Once);
             _mockDataService.Verify(x => x.AddTransitionHistoryAsync(It.IsAny<StateTransitionHistory>()), Times.Once);
         }
 
@@ -96,7 +97,7 @@ namespace StateMachineExperiments.Tests.InformalLOD
             {
                 Id = 1,
                 CaseNumber = "TEST-001",
-                CurrentState = nameof(LodState.Start),
+                CurrentState = LodState.Start,
                 TransitionHistory = new List<StateTransitionHistory>()
             };
 
@@ -117,7 +118,7 @@ namespace StateMachineExperiments.Tests.InformalLOD
             {
                 Id = 1,
                 CaseNumber = "TEST-001",
-                CurrentState = nameof(LodState.CommanderReview),
+                CurrentState = LodState.CommanderReview,
                 RequiresLegalReview = true,
                 TransitionHistory = new List<StateTransitionHistory>()
             };
@@ -132,7 +133,7 @@ namespace StateMachineExperiments.Tests.InformalLOD
             await _service.FireTriggerAsync(1, LodTrigger.ReviewFinished);
 
             // Assert
-            _mockDataService.Verify(x => x.UpdateCaseAsync(It.Is<InformalLineOfDuty>(c => c.CurrentState == nameof(LodState.OptionalLegal))), Times.Once);
+            _mockDataService.Verify(x => x.UpdateCaseAsync(It.Is<InformalLineOfDuty>(c => c.CurrentState == LodState.OptionalLegal)), Times.Once);
         }
 
         [Fact]
@@ -143,7 +144,7 @@ namespace StateMachineExperiments.Tests.InformalLOD
             {
                 Id = 1,
                 CaseNumber = "TEST-001",
-                CurrentState = nameof(LodState.Start),
+                CurrentState = LodState.Start,
                 TransitionHistory = new List<StateTransitionHistory>()
             };
 

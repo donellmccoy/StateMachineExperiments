@@ -26,7 +26,7 @@ namespace StateMachineExperiments.Tests.FormalLOD
             // Arrange
             var lodCase = new FormalLineOfDuty
             {
-                CurrentState = nameof(FormalLodState.Start)
+                CurrentState = FormalLodState.Start
             };
 
             // Act
@@ -43,7 +43,7 @@ namespace StateMachineExperiments.Tests.FormalLOD
             // Arrange
             var lodCase = new FormalLineOfDuty
             {
-                CurrentState = nameof(FormalLodState.Investigation)
+                CurrentState = FormalLodState.Investigation
             };
 
             // Act
@@ -60,7 +60,7 @@ namespace StateMachineExperiments.Tests.FormalLOD
             // Arrange
             var lodCase = new FormalLineOfDuty
             {
-                CurrentState = nameof(FormalLodState.MemberReports),
+                CurrentState = FormalLodState.MemberReports,
                 MemberId = null
             };
 
@@ -78,7 +78,7 @@ namespace StateMachineExperiments.Tests.FormalLOD
             // Arrange
             var lodCase = new FormalLineOfDuty
             {
-                CurrentState = nameof(FormalLodState.MemberReports),
+                CurrentState = FormalLodState.MemberReports,
                 MemberId = "M123456"
             };
 
@@ -95,7 +95,7 @@ namespace StateMachineExperiments.Tests.FormalLOD
             // Arrange
             var lodCase = new FormalLineOfDuty
             {
-                CurrentState = nameof(FormalLodState.AppointingOfficer),
+                CurrentState = FormalLodState.AppointingOfficer,
                 InvestigatingOfficerId = null
             };
 
@@ -113,7 +113,7 @@ namespace StateMachineExperiments.Tests.FormalLOD
             // Arrange
             var lodCase = new FormalLineOfDuty
             {
-                CurrentState = nameof(FormalLodState.AppointingOfficer),
+                CurrentState = FormalLodState.AppointingOfficer,
                 InvestigatingOfficerId = "O123456"
             };
 
@@ -134,7 +134,7 @@ namespace StateMachineExperiments.Tests.FormalLOD
             // Arrange
             var lodCase = new FormalLineOfDuty
             {
-                CurrentState = nameof(FormalLodState.Investigation),
+                CurrentState = FormalLodState.Investigation,
                 ToxicologyRequired = toxRequired
             };
 
@@ -161,7 +161,7 @@ namespace StateMachineExperiments.Tests.FormalLOD
             // Arrange
             var lodCase = new FormalLineOfDuty
             {
-                CurrentState = nameof(FormalLodState.Notification),
+                CurrentState = FormalLodState.Notification,
                 IsDeathCase = false
             };
 
@@ -186,7 +186,7 @@ namespace StateMachineExperiments.Tests.FormalLOD
             // Arrange
             var lodCase = new FormalLineOfDuty
             {
-                CurrentState = nameof(FormalLodState.Notification),
+                CurrentState = FormalLodState.Notification,
                 IsDeathCase = true
             };
 
@@ -208,7 +208,7 @@ namespace StateMachineExperiments.Tests.FormalLOD
             // Arrange
             var lodCase = new FormalLineOfDuty
             {
-                CurrentState = nameof(FormalLodState.Investigation)
+                CurrentState = FormalLodState.Investigation
             };
 
             // Act
@@ -225,7 +225,7 @@ namespace StateMachineExperiments.Tests.FormalLOD
             // Arrange
             var lodCase = new FormalLineOfDuty
             {
-                CurrentState = nameof(FormalLodState.Notification)
+                CurrentState = FormalLodState.Notification
             };
 
             // Act
@@ -248,7 +248,7 @@ namespace StateMachineExperiments.Tests.FormalLOD
             // Arrange
             var lodCase = new FormalLineOfDuty
             {
-                CurrentState = nameof(FormalLodState.Investigation)
+                CurrentState = FormalLodState.Investigation
             };
 
             // Act
@@ -264,7 +264,7 @@ namespace StateMachineExperiments.Tests.FormalLOD
             // Arrange - case with missing member ID trying to report condition
             var lodCase = new FormalLineOfDuty
             {
-                CurrentState = nameof(FormalLodState.MemberReports),
+                CurrentState = FormalLodState.MemberReports,
                 MemberId = ""  // Empty member ID
             };
 

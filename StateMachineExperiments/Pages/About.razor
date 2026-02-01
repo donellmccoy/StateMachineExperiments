@@ -1,0 +1,59 @@
+@page "/about"
+
+<PageTitle>About - State Machine Experiments</PageTitle>
+
+<div class="card">
+    <h1>About This Application</h1>
+
+    <h2>Purpose</h2>
+    <p>
+        This application demonstrates a production-ready state machine architecture for managing complex workflows.
+        It showcases best practices for implementing state-driven business logic in .NET applications.
+    </p>
+
+    <h2>Technology Stack</h2>
+    <ul>
+        <li><strong>Blazor WebAssembly</strong> - Client-side web UI framework running in the browser</li>
+        <li><strong>.NET 10.0</strong> - Latest .NET runtime with C# language features</li>
+        <li><strong>Stateless Library</strong> - Hierarchical state machine library with async support</li>
+        <li><strong>Entity Framework Core</strong> - In-memory database for case persistence</li>
+        <li><strong>MailKit</strong> - SMTP email service integration</li>
+    </ul>
+
+    <h2>State Machine Pattern Benefits</h2>
+    <div class="card">
+        <h3>Type Safety</h3>
+        <p>Enum-based states and triggers eliminate runtime errors from string mismatches.</p>
+
+        <h3>Explicit Transitions</h3>
+        <p>All valid state transitions are defined upfront, preventing invalid state changes.</p>
+
+        <h3>Centralized Business Logic</h3>
+        <p>Workflow logic is encapsulated in state machine configuration, not scattered across controllers.</p>
+
+        <h3>Auditability</h3>
+        <p>Every state transition is recorded in the database with timestamps and metadata.</p>
+
+        <h3>Testability</h3>
+        <p>State machines can be easily unit tested with mock services and validators.</p>
+    </div>
+
+    <h2>Workflow Examples</h2>
+    <div class="card">
+        <h3>Informal LOD Process</h3>
+        <p>Start → Member Reports → Initial Review → Determination → End</p>
+
+        <h3>Formal LOD Process</h3>
+        <p>Start → Member Reports → Initial Review → Medical Review → Determination → (Optional Appeal) → End</p>
+    </div>
+
+    <h2>Developer</h2>
+    <p>This project demonstrates modern .NET development practices including:</p>
+    <ul>
+        <li>Clean architecture with separated concerns</li>
+        <li>Dependency injection for testability</li>
+        <li>Async/await patterns throughout</li>
+        <li>Entity Framework Core for data access</li>
+        <li>Comprehensive unit testing</li>
+    </ul>
+</div>

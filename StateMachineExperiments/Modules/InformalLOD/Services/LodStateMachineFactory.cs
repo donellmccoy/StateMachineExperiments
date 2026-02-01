@@ -3,23 +3,10 @@ using StateMachineExperiments.Common.Infrastructure;
 using StateMachineExperiments.Modules.InformalLOD.Events;
 using StateMachineExperiments.Modules.InformalLOD.Models;
 using System;
+using System.Threading.Tasks;
 
 namespace StateMachineExperiments.Modules.InformalLOD.Services
 {
-    public class ReviewData
-    {
-        public bool Approved { get; set; }
-        public string? ReviewerId { get; set; }
-        public string? Comments { get; set; }
-    }
-
-    public interface ILodStateMachineFactory
-    {
-        StateMachine<LodState, LodTrigger> CreateStateMachine(
-            InformalLineOfDuty lodCase, 
-            INotificationService? notificationService = null);
-    }
-
     public class LodStateMachineFactory : ILodStateMachineFactory
     {
         private readonly INotificationService _notificationService;
@@ -29,132 +16,131 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
             _notificationService = notificationService;
         }
 
-        public StateMachine<LodState, LodTrigger> CreateStateMachine(
-            InformalLineOfDuty lodCase, 
-            INotificationService? notificationService = null)
+        public StateMachine<LodState, LodTrigger> CreateStateMachine(InformalLineOfDuty lodCase)
         {
-            // Use injected service if not provided as parameter
-            var notificationSvc = notificationService ?? _notificationService;
-            var currentState = Enum.Parse<LodState>(lodCase.CurrentState);
-            var stateMachine = new StateMachine<LodState, LodTrigger>(currentState);
+            var stateMachine = new StateMachine<LodState, LodTrigger>(lodCase.CurrentState);
 
             // Configure Start state
             stateMachine.Configure(LodState.Start)
                 .Permit(LodTrigger.ProcessInitiated, LodState.MemberReports)
-                .OnExit(() => OnStateExit(LodState.Start, lodCase, notificationSvc));
+                .OnExitAsync(async () => await OnStateExitAsync(LodState.Start, lodCase));
 
             // Configure MemberReports state
             stateMachine.Configure(LodState.MemberReports)
-                .OnEntry(() => OnStateEntry(LodState.MemberReports, lodCase, notificationSvc))
+                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.MemberReports, lodCase))
                 .Permit(LodTrigger.ConditionReported, LodState.LodInitiation)
-                .OnExit(() => OnStateExit(LodState.MemberReports, lodCase, notificationSvc));
+                .OnExitAsync(async () => await OnStateExitAsync(LodState.MemberReports, lodCase));
 
             // Configure LodInitiation state
             stateMachine.Configure(LodState.LodInitiation)
-                .OnEntry(() => OnStateEntry(LodState.LodInitiation, lodCase, notificationSvc))
+                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.LodInitiation, lodCase))
                 .Permit(LodTrigger.InitiationComplete, LodState.MedicalAssessment)
-                .OnExit(() => OnStateExit(LodState.LodInitiation, lodCase, notificationSvc));
+                .OnExitAsync(async () => await OnStateExitAsync(LodState.LodInitiation, lodCase));
 
             // Configure MedicalAssessment state
             stateMachine.Configure(LodState.MedicalAssessment)
-                .OnEntry(() => OnStateEntry(LodState.MedicalAssessment, lodCase, notificationSvc))
+                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.MedicalAssessment, lodCase))
                 .Permit(LodTrigger.AssessmentDone, LodState.CommanderReview)
-                .OnExit(() => OnStateExit(LodState.MedicalAssessment, lodCase, notificationSvc));
+                .OnExitAsync(async () => await OnStateExitAsync(LodState.MedicalAssessment, lodCase));
 
             // Configure CommanderReview state - dynamic routing based on case requirements
             stateMachine.Configure(LodState.CommanderReview)
-                .OnEntry(() => OnStateEntry(LodState.CommanderReview, lodCase, notificationSvc))
+                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.CommanderReview, lodCase))
                 .PermitIf(LodTrigger.ReviewFinished, LodState.OptionalLegal, () => lodCase.RequiresLegalReview)
                 .Permit(LodTrigger.SkipToAdjudication, LodState.BoardAdjudication)
-                .OnExit(() => OnStateExit(LodState.CommanderReview, lodCase, notificationSvc));
+                .OnExitAsync(async () => await OnStateExitAsync(LodState.CommanderReview, lodCase));
 
             // Configure OptionalLegal state
             stateMachine.Configure(LodState.OptionalLegal)
-                .OnEntry(() => OnStateEntry(LodState.OptionalLegal, lodCase, notificationSvc))
+                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.OptionalLegal, lodCase))
                 .PermitIf(LodTrigger.LegalDone, LodState.OptionalWing, () => lodCase.RequiresWingReview)
                 .Permit(LodTrigger.SkipWingReview, LodState.BoardAdjudication)
-                .OnExit(() => OnStateExit(LodState.OptionalLegal, lodCase, notificationSvc));
+                .OnExitAsync(async () => await OnStateExitAsync(LodState.OptionalLegal, lodCase));
 
             // Configure OptionalWing state
             stateMachine.Configure(LodState.OptionalWing)
-                .OnEntry(() => OnStateEntry(LodState.OptionalWing, lodCase, notificationSvc))
+                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.OptionalWing, lodCase))
                 .Permit(LodTrigger.WingDone, LodState.BoardAdjudication)
-                .OnExit(() => OnStateExit(LodState.OptionalWing, lodCase, notificationSvc));
+                .OnExitAsync(async () => await OnStateExitAsync(LodState.OptionalWing, lodCase));
 
             // Configure BoardAdjudication state
             stateMachine.Configure(LodState.BoardAdjudication)
-                .OnEntry(() => OnStateEntry(LodState.BoardAdjudication, lodCase, notificationSvc))
+                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.BoardAdjudication, lodCase))
                 .Permit(LodTrigger.AdjudicationComplete, LodState.Determination)
-                .OnExit(() => OnStateExit(LodState.BoardAdjudication, lodCase, notificationSvc));
+                .OnExitAsync(async () => await OnStateExitAsync(LodState.BoardAdjudication, lodCase));
 
             // Configure Determination state
             stateMachine.Configure(LodState.Determination)
-                .OnEntry(() => OnStateEntry(LodState.Determination, lodCase, notificationSvc))
+                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.Determination, lodCase))
                 .Permit(LodTrigger.DeterminationFinalized, LodState.Notification)
-                .OnExit(() =>
-                {
-                    // Notify stakeholders of finalized determination
-                    notificationSvc.SendStakeholderAlert(
-                        caseNumber: lodCase.CaseNumber,
-                        alertType: "Determination Finalized",
-                        message: $"LOD determination finalized for case {lodCase.CaseNumber}: In Line of Duty",
-                        stakeholders: new[] { "HQ AFRC/A1", "LOD Manager" });
-                    OnStateExit(LodState.Determination, lodCase, notificationSvc);
-                });
+                .OnExitAsync(async () => await OnStateExitAsync(LodState.Determination, lodCase));
 
             // Configure Notification state
             stateMachine.Configure(LodState.Notification)
-                .OnEntry(() =>
-                {
-                    // Auto-send notification when entering this state
-                    SendNotification(lodCase, notificationSvc);
-                    OnStateEntry(LodState.Notification, lodCase, notificationSvc);
-                })
+                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.Notification, lodCase))
                 .Permit(LodTrigger.AppealFiled, LodState.Appeal)
                 .Permit(LodTrigger.NotificationComplete, LodState.End)
-                .OnExit(() => OnStateExit(LodState.Notification, lodCase, notificationSvc));
+                .OnExitAsync(async () => await OnStateExitAsync(LodState.Notification, lodCase));
 
             // Configure Appeal state
             stateMachine.Configure(LodState.Appeal)
-                .OnEntry(() =>
-                {
-                    notificationSvc.SendNotification(
-                        recipient: lodCase.MemberName ?? "Member",
-                        subject: $"Appeal Filed - Case {lodCase.CaseNumber}",
-                        message: $"An appeal has been filed for LOD case {lodCase.CaseNumber} on {DateTime.UtcNow:yyyy-MM-dd}. " +
-                                $"The appeal will be reviewed by HQ AFRC/CD.",
-                        notificationType: "Email");
-                    OnStateEntry(LodState.Appeal, lodCase, notificationSvc);
-                })
+                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.Appeal, lodCase))
                 .Permit(LodTrigger.AppealResolved, LodState.End)
-                .OnExit(() => OnStateExit(LodState.Appeal, lodCase, notificationSvc));
+                .OnExitAsync(async () => await OnStateExitAsync(LodState.Appeal, lodCase));
 
             // Configure End state
             stateMachine.Configure(LodState.End)
-                .OnEntry(() => OnStateEntry(LodState.End, lodCase, notificationSvc));
+                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.End, lodCase));
 
             return stateMachine;
         }
 
-        private static void OnStateEntry(LodState state, InformalLineOfDuty lodCase, INotificationService notificationService)
+        private async Task OnStateEntryAsync(LodState state, InformalLineOfDuty lodCase)
         {
             Console.WriteLine($"[ENTRY] Entering state: {state} for case {lodCase.CaseNumber}");
+
+            // Handle state-specific notifications
+            switch (state)
+            {
+                case LodState.Determination:
+                    await _notificationService.AlertStakeholdersAsync(new StakeholderAlertRequest
+                    {
+                        CaseNumber = lodCase.CaseNumber,
+                        AlertType = "Determination Finalized",
+                        Message = $"LOD determination finalized for case {lodCase.CaseNumber}: In Line of Duty",
+                        Stakeholders = ["HQ AFRC/A1", "LOD Manager"]
+                    });
+                    break;
+
+                case LodState.Notification:
+                    await _notificationService.NotifyDeterminationAsync(new DeterminationNotificationRequest
+                    {
+                        CaseNumber = lodCase.CaseNumber,
+                        MemberId = lodCase.MemberId ?? "Unknown",
+                        MemberName = lodCase.MemberName ?? "Unknown",
+                        Determination = "In Line of Duty",
+                        AppealWindowDays = 30,
+                        NotificationType = "Email"
+                    });
+                    break;
+
+                case LodState.Appeal:
+                    await _notificationService.NotifyAsync(new NotificationRequest
+                    {
+                        Recipient = lodCase.MemberName ?? "Member",
+                        Subject = $"Appeal Filed - Case {lodCase.CaseNumber}",
+                        Message = $"An appeal has been filed for LOD case {lodCase.CaseNumber} on {DateTime.UtcNow:yyyy-MM-dd}. " +
+                                 $"The appeal will be reviewed by HQ AFRC/CD.",
+                        NotificationType = "Email"
+                    });
+                    break;
+            }
         }
 
-        private static void OnStateExit(LodState state, InformalLineOfDuty lodCase, INotificationService notificationService)
+        private async Task OnStateExitAsync(LodState state, InformalLineOfDuty lodCase)
         {
             Console.WriteLine($"[EXIT] Exiting state: {state} for case {lodCase.CaseNumber}");
-        }
-
-        private static void SendNotification(InformalLineOfDuty lodCase, INotificationService notificationService)
-        {
-            notificationService.SendDeterminationNotification(
-                caseNumber: lodCase.CaseNumber,
-                memberId: lodCase.MemberId ?? "Unknown",
-                memberName: lodCase.MemberName ?? "Unknown",
-                determination: "In Line of Duty",
-                appealWindowDays: 30,
-                notificationType: "Email");
+            await Task.CompletedTask;
         }
     }
 }

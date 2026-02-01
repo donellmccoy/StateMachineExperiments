@@ -24,13 +24,10 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
         {
             var errors = new List<string>();
 
-            // Validate based on trigger and current state
-            var currentState = System.Enum.Parse<LodState>(lodCase.CurrentState);
-
             switch (trigger)
             {
                 case LodTrigger.ProcessInitiated:
-                    if (currentState != LodState.Start)
+                    if (lodCase.CurrentState != LodState.Start)
                         errors.Add("Process can only be initiated from Start state");
                     break;
 
@@ -44,7 +41,7 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
                     break;
 
                 case LodTrigger.ReviewFinished:
-                    if (currentState == LodState.CommanderReview)
+                    if (lodCase.CurrentState == LodState.CommanderReview)
                     {
                         // Validate that commander has provided their review
                     }
@@ -56,7 +53,7 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
                     break;
 
                 case LodTrigger.NotificationComplete:
-                    if (currentState != LodState.Notification)
+                    if (lodCase.CurrentState != LodState.Notification)
                         errors.Add("Can only complete notification from Notification state");
                     break;
             }

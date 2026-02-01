@@ -23,7 +23,7 @@ namespace StateMachineExperiments.Modules.InformalLOD.Models
         /// <summary>
         /// Gets or sets the current state of the case in the workflow.
         /// </summary>
-        public string CurrentState { get; set; } = nameof(LodState.Start);
+        public LodState CurrentState { get; set; } = LodState.Start;
         
         /// <summary>
         /// Gets or sets the date and time when the case was created.

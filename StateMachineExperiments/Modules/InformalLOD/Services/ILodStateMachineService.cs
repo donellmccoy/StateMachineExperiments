@@ -56,6 +56,14 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
         Task<List<string>> GetPermittedTriggersAsync(int caseId);
         
         /// <summary>
+        /// Checks if a specific trigger can be fired for a case in its current state.
+        /// </summary>
+        /// <param name="caseId">The ID of the case.</param>
+        /// <param name="trigger">The trigger to check.</param>
+        /// <returns>True if the trigger can be fired, otherwise false.</returns>
+        Task<bool> CanFireAsync(int caseId, LodTrigger trigger);
+        
+        /// <summary>
         /// Validates whether a trigger can be fired on a case before attempting the transition.
         /// </summary>
         /// <param name="caseId">The ID of the case.</param>
