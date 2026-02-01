@@ -69,6 +69,6 @@ namespace StateMachineExperiments.Modules.FormalLOD.Services
         /// </summary>
         /// <param name="state">The Formal LOD state.</param>
         /// <returns>String representation of the responsible authority.</returns>
-        string GetCurrentAuthority(FormalLodState state);
+        FormalLodAuthority GetCurrentAuthority(FormalLodState state);
     }
 }

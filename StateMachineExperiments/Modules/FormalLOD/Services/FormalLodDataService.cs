@@ -10,16 +10,18 @@ namespace StateMachineExperiments.Modules.FormalLOD.Services
 {
     public class FormalLodDataService : IFormalLodDataService
     {
-        private readonly LodDbContext _context;
+        private readonly IDbContextFactory<LodDbContext> _contextFactory;
 
-        public FormalLodDataService(LodDbContext context)
+        public FormalLodDataService(IDbContextFactory<LodDbContext> contextFactory)
         {
-            _context = context;
+            _contextFactory = contextFactory;
         }
 
         public async Task<FormalLineOfDuty> CreateNewCaseAsync(string caseNumber, string? memberId = null, string? memberName = null, bool isDeathCase = false)
         {
-            var entity = _context.FormalLodCases.Add(new FormalLineOfDuty
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            
+            var entity = context.FormalLodCases.Add(new FormalLineOfDuty
             {
                 CaseNumber = caseNumber,
                 MemberId = memberId,
@@ -30,40 +32,50 @@ namespace StateMachineExperiments.Modules.FormalLOD.Services
                 LastModifiedDate = DateTime.UtcNow
             });
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
             return entity.Entity;
         }
 
         public async Task<FormalLineOfDuty?> GetCaseAsync(int caseId)
         {
-            return await _context.FormalLodCases
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            
+            return await context.FormalLodCases
                 .Include(c => c.TransitionHistory)
                 .FirstOrDefaultAsync(c => c.Id == caseId);
         }
 
         public async Task<FormalLineOfDuty?> GetCaseByCaseNumberAsync(string caseNumber)
         {
-            return await _context.FormalLodCases
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            
+            return await context.FormalLodCases
                 .Include(c => c.TransitionHistory)
                 .FirstOrDefaultAsync(c => c.CaseNumber == caseNumber);
         }
 
         public async Task UpdateCaseAsync(FormalLineOfDuty lodCase)
         {
-            _context.FormalLodCases.Update(lodCase);
-            await _context.SaveChangesAsync();
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            
+            context.FormalLodCases.Update(lodCase);
+            await context.SaveChangesAsync();
         }
 
         public async Task AddTransitionHistoryAsync(FormalStateTransitionHistory history)
         {
-            _context.FormalTransitionHistory.Add(history);
-            await _context.SaveChangesAsync();
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            
+            context.FormalTransitionHistory.Add(history);
+            await context.SaveChangesAsync();
         }
 
         public async Task<List<FormalStateTransitionHistory>> GetCaseHistoryAsync(int caseId)
         {
-            return await _context.FormalTransitionHistory
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            
+            return await context.FormalTransitionHistory
                 .Where(h => h.FormalLodCaseId == caseId)
                 .OrderBy(h => h.Timestamp)
                 .ToListAsync();

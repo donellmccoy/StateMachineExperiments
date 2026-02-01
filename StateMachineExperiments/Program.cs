@@ -15,8 +15,8 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 // Configure logging
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
 
-// Configure DbContext with in-memory database (SQLite doesn't work in browser)
-builder.Services.AddDbContext<LodDbContext>(options =>
+// Configure DbContext factory with in-memory database (SQLite doesn't work in browser)
+builder.Services.AddDbContextFactory<LodDbContext>(options =>
     options.UseInMemoryDatabase("LodCasesDb"));
 
 // Bind configuration settings
@@ -33,7 +33,7 @@ builder.Services.AddScoped<ISmtpService, SmtpService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 
 // Register Informal LOD services
-builder.Services.AddScoped<ILodDataService, LodDataService>();
+builder.Services.AddScoped<IInformalLineOfDutyDataService, InformalLineOfDutyService>();
 builder.Services.AddScoped<ILodBusinessRuleService, LodBusinessRuleService>();
 builder.Services.AddScoped<ILodStateMachineFactory, LodStateMachineFactory>();
 builder.Services.AddScoped<ILodTransitionValidator, LodTransitionValidator>();

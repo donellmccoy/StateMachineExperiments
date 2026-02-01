@@ -13,7 +13,7 @@ namespace StateMachineExperiments.Tests.InformalLOD
 {
     public class LodStateMachineServiceTests
     {
-        private readonly Mock<ILodDataService> _mockDataService;
+        private readonly Mock<IInformalLineOfDutyDataService> _mockDataService;
         private readonly Mock<ILodBusinessRuleService> _mockBusinessRules;
         private readonly Mock<ILodTransitionValidator> _mockValidator;
         private readonly ILodStateMachineFactory _stateMachineFactory;
@@ -22,7 +22,7 @@ namespace StateMachineExperiments.Tests.InformalLOD
 
         public LodStateMachineServiceTests()
         {
-            _mockDataService = new Mock<ILodDataService>();
+            _mockDataService = new Mock<IInformalLineOfDutyDataService>();
             _mockBusinessRules = new Mock<ILodBusinessRuleService>();
             _mockValidator = new Mock<ILodTransitionValidator>();
             var mockSmtpService = new Mock<ISmtpService>();

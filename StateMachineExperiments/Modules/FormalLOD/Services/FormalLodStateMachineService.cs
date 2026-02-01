@@ -108,9 +108,9 @@ namespace StateMachineExperiments.Modules.FormalLOD.Services
             await _dataService.AddTransitionHistoryAsync(new FormalStateTransitionHistory
             {
                 FormalLodCaseId = caseId,
-                FromState = fromState.ToString(),
-                ToState = toState.ToString(),
-                Trigger = trigger.ToString(),
+                FromState = fromState,
+                ToState = toState,
+                Trigger = trigger,
                 Timestamp = DateTime.UtcNow,
                 PerformedByAuthority = authority,
                 Notes = notes
@@ -152,9 +152,9 @@ namespace StateMachineExperiments.Modules.FormalLOD.Services
             return await _validator.ValidateTransitionAsync(lodCase, trigger);
         }
 
-        public string GetCurrentAuthority(FormalLodState state)
+        public FormalLodAuthority GetCurrentAuthority(FormalLodState state)
         {
-            return _stateToAuthorityMap.GetValueOrDefault(state, FormalLodAuthority.None).ToString();
+            return _stateToAuthorityMap.GetValueOrDefault(state, FormalLodAuthority.None);
         }
     }
 }

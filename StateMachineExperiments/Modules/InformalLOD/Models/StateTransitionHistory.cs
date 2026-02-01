@@ -9,12 +9,12 @@ namespace StateMachineExperiments.Modules.InformalLOD.Models
     public class StateTransitionHistory
     {
         public int Id { get; set; }
-        public int LodCaseId { get; set; }
-        public string FromState { get; set; } = string.Empty;
-        public string ToState { get; set; } = string.Empty;
-        public string Trigger { get; set; } = string.Empty;
+        public int CaseId { get; set; }
+        public LodState FromState { get; set; }
+        public LodState ToState { get; set; }
+        public LodTrigger Trigger { get; set; }
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
-        public string? PerformedByAuthority { get; set; }
+        public LodAuthority PerformedByAuthority { get; set; }
         public string? Notes { get; set; }
         
         // Navigation property

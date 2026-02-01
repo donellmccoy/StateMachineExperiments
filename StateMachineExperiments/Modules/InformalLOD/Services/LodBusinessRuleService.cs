@@ -33,7 +33,7 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
         {
             // Find the notification date from transition history
             var notificationTransition = lodCase.TransitionHistory
-                .FirstOrDefault(t => t.ToState == nameof(LodState.Notification));
+                .FirstOrDefault(t => t.ToState == LodState.Notification);
 
             if (notificationTransition == null)
             {

@@ -8,13 +8,13 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
     /// Data access service for Informal Line of Duty cases.
     /// Provides CRUD operations and persistence for LOD entities.
     /// </summary>
-    public interface ILodDataService
+    public interface IInformalLineOfDutyDataService
     {
-        Task<InformalLineOfDuty> CreateNewCaseAsync(string caseNumber, string? memberId = null, string? memberName = null);
+        Task<InformalLineOfDuty> CreateNewCaseAsync(string caseNumber, string memberId, string? memberName = null);
         Task<InformalLineOfDuty?> GetCaseAsync(int caseId);
         Task<InformalLineOfDuty?> GetCaseByCaseNumberAsync(string caseNumber);
         Task UpdateCaseAsync(InformalLineOfDuty lodCase);
         Task AddTransitionHistoryAsync(StateTransitionHistory history);
-        Task<List<StateTransitionHistory>> GetCaseHistoryAsync(int caseId);
+        Task<List<StateTransitionHistory>> GetTransitionHistoryAsync(int caseId);
     }
 }

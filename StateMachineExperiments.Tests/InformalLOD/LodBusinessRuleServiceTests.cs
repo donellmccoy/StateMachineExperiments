@@ -1,5 +1,6 @@
 using StateMachineExperiments.Modules.InformalLOD.Models;
 using StateMachineExperiments.Modules.InformalLOD.Services;
+using StateMachineExperiments.Common.Infrastructure;
 using System;
 using System.Collections.Generic;
 using Xunit;
@@ -12,7 +13,8 @@ namespace StateMachineExperiments.Tests.InformalLOD
 
         public LodBusinessRuleServiceTests()
         {
-            _service = new LodBusinessRuleService();
+            var settings = new BusinessRulesSettings();
+            _service = new LodBusinessRuleService(settings);
         }
 
         [Theory]
@@ -70,7 +72,7 @@ namespace StateMachineExperiments.Tests.InformalLOD
                 {
                     new StateTransitionHistory
                     {
-                        ToState = nameof(LodState.Notification),
+                        ToState = LodState.Notification,
                         Timestamp = notificationDate
                     }
                 }
@@ -96,7 +98,7 @@ namespace StateMachineExperiments.Tests.InformalLOD
                 {
                     new StateTransitionHistory
                     {
-                        ToState = nameof(LodState.Notification),
+                        ToState = LodState.Notification,
                         Timestamp = notificationDate
                     }
                 }

@@ -186,7 +186,7 @@ namespace StateMachineExperiments.Tests.FormalLOD
         [Theory]
         [ClassData(typeof(StateToAuthorityMappingTestData))]
         public void GetCurrentAuthority_ShouldReturnCorrectAuthority(
-            FormalLodState state, string expectedAuthority)
+            FormalLodState state, FormalLodAuthority expectedAuthority)
         {
             // Act
             var authority = _service.GetCurrentAuthority(state);
@@ -306,18 +306,18 @@ namespace StateMachineExperiments.Tests.FormalLOD
     {
         public IEnumerator<object[]> GetEnumerator()
         {
-            yield return new object[] { FormalLodState.Start, "None" };
-            yield return new object[] { FormalLodState.MemberReports, "Member" };
-            yield return new object[] { FormalLodState.FormalInitiation, "LodMfp" };
-            yield return new object[] { FormalLodState.AppointingOfficer, "AppointingAuthority" };
-            yield return new object[] { FormalLodState.Investigation, "InvestigatingOfficer" };
-            yield return new object[] { FormalLodState.WingLegalReview, "LegalAdvisor" };
-            yield return new object[] { FormalLodState.WingCommanderReview, "WingCommander" };
-            yield return new object[] { FormalLodState.BoardAdjudication, "ReviewingBoard" };
-            yield return new object[] { FormalLodState.Determination, "ApprovingAuthority" };
-            yield return new object[] { FormalLodState.Notification, "LodPm" };
-            yield return new object[] { FormalLodState.Appeal, "AppellateAuthority" };
-            yield return new object[] { FormalLodState.End, "None" };
+            yield return new object[] { FormalLodState.Start, FormalLodAuthority.None };
+            yield return new object[] { FormalLodState.MemberReports, FormalLodAuthority.Member };
+            yield return new object[] { FormalLodState.FormalInitiation, FormalLodAuthority.LodMfp };
+            yield return new object[] { FormalLodState.AppointingOfficer, FormalLodAuthority.AppointingAuthority };
+            yield return new object[] { FormalLodState.Investigation, FormalLodAuthority.InvestigatingOfficer };
+            yield return new object[] { FormalLodState.WingLegalReview, FormalLodAuthority.LegalAdvisor };
+            yield return new object[] { FormalLodState.WingCommanderReview, FormalLodAuthority.WingCommander };
+            yield return new object[] { FormalLodState.BoardAdjudication, FormalLodAuthority.ReviewingBoard };
+            yield return new object[] { FormalLodState.Determination, FormalLodAuthority.ApprovingAuthority };
+            yield return new object[] { FormalLodState.Notification, FormalLodAuthority.LodPm };
+            yield return new object[] { FormalLodState.Appeal, FormalLodAuthority.AppellateAuthority };
+            yield return new object[] { FormalLodState.End, FormalLodAuthority.None };
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

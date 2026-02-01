@@ -103,43 +103,21 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
             switch (state)
             {
                 case LodState.Determination:
-                    await _notificationService.AlertStakeholdersAsync(new StakeholderAlertRequest
-                    {
-                        CaseNumber = lodCase.CaseNumber,
-                        AlertType = "Determination Finalized",
-                        Message = $"LOD determination finalized for case {lodCase.CaseNumber}: In Line of Duty",
-                        Stakeholders = ["HQ AFRC/A1", "LOD Manager"]
-                    });
                     break;
 
                 case LodState.Notification:
-                    await _notificationService.NotifyDeterminationAsync(new DeterminationNotificationRequest
-                    {
-                        CaseNumber = lodCase.CaseNumber,
-                        MemberId = lodCase.MemberId ?? "Unknown",
-                        MemberName = lodCase.MemberName ?? "Unknown",
-                        Determination = "In Line of Duty",
-                        AppealWindowDays = 30,
-                        NotificationType = "Email"
-                    });
                     break;
 
                 case LodState.Appeal:
-                    await _notificationService.NotifyAsync(new NotificationRequest
-                    {
-                        Recipient = lodCase.MemberName ?? "Member",
-                        Subject = $"Appeal Filed - Case {lodCase.CaseNumber}",
-                        Message = $"An appeal has been filed for LOD case {lodCase.CaseNumber} on {DateTime.UtcNow:yyyy-MM-dd}. " +
-                                 $"The appeal will be reviewed by HQ AFRC/CD.",
-                        NotificationType = "Email"
-                    });
                     break;
             }
+            await Task.CompletedTask;
         }
 
         private static async Task OnStateExitAsync(LodState state, InformalLineOfDuty lodCase)
         {
             Console.WriteLine($"[EXIT] Exiting state: {state} for case {lodCase.CaseNumber}");
+            
             await Task.CompletedTask;
         }
     }

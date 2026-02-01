@@ -13,7 +13,7 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
 {
     public class LodStateMachineService : ILodStateMachineService
     {
-        private readonly ILodDataService _dataService;
+        private readonly IInformalLineOfDutyDataService _dataService;
         private readonly ILodBusinessRuleService _businessRules;
         private readonly ILodTransitionValidator _validator;
         private readonly ILodStateMachineFactory _stateMachineFactory;
@@ -22,7 +22,7 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
         private readonly Dictionary<LodState, LodAuthority> _stateToAuthorityMap;
 
         public LodStateMachineService(
-            ILodDataService dataService,
+            IInformalLineOfDutyDataService dataService,
             ILodBusinessRuleService businessRules,
             ILodTransitionValidator validator,
             ILodStateMachineFactory stateMachineFactory,
@@ -63,15 +63,6 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
             _logger.LogInformation("LOD case created successfully: {CaseNumber} with ID {CaseId}", 
                 lodCase.CaseNumber, lodCase.Id);
 
-            // Send notification to stakeholders
-            await _notificationService.AlertStakeholdersAsync(new StakeholderAlertRequest
-            {
-                CaseNumber = caseNumber,
-                AlertType = "New LOD Case Created",
-                Message = $"New informal LOD case {caseNumber} created for {memberName ?? "member"} ({memberId ?? "N/A"})",
-                Stakeholders = ["LOD Manager"]
-            });
-
             return lodCase;
         }
 
@@ -82,76 +73,78 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
 
         public async Task<InformalLineOfDuty?> GetCaseByCaseNumberAsync(string caseNumber)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(caseNumber);
+            
             return await _dataService.GetCaseByCaseNumberAsync(caseNumber);
         }
 
         public async Task FireTriggerAsync(int caseId, LodTrigger trigger, string? notes = null)
         {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(caseId);
+
             _logger.LogDebug("Attempting to fire trigger {Trigger} for case ID {CaseId}", trigger, caseId);
 
             var lodCase = await GetCaseAsync(caseId) ?? throw new CaseNotFoundException(caseId);
 
-            // Validate the transition
-            var validationResult = await _validator.ValidateTransitionAsync(lodCase, trigger);
-            if (!validationResult.IsValid)
-            {
-                _logger.LogWarning("Transition validation failed for case {CaseNumber}. Errors: {Errors}", 
-                    lodCase.CaseNumber, string.Join("; ", validationResult.Errors));
-                throw new TransitionValidationException(string.Join("; ", validationResult.Errors));
-            }
+            await FireTriggerAsync(lodCase, trigger, notes);
+        }
+
+        public async Task FireTriggerAsync(InformalLineOfDuty lodCase, LodTrigger trigger, string? notes = null)
+        {
+            ArgumentNullException.ThrowIfNull(lodCase);
+
+            _logger.LogDebug("Attempting to fire trigger {Trigger} for case {CaseNumber}", trigger, lodCase.CaseNumber);
 
             var stateMachine = _stateMachineFactory.CreateStateMachine(lodCase);
 
             if (!stateMachine.CanFire(trigger))
             {
                 var permitted = (await stateMachine.PermittedTriggersAsync).Select(t => t.ToString()).ToArray();
+                
                 _logger.LogWarning("Invalid state transition for case {CaseNumber}. Current state: {CurrentState}, Trigger: {Trigger}, Permitted: {Permitted}", 
                     lodCase.CaseNumber, lodCase.CurrentState, trigger, string.Join(", ", permitted));
+
                 throw new InvalidStateTransitionException(lodCase.CurrentState.ToString(), trigger.ToString(), permitted);
             }
 
             var fromState = lodCase.CurrentState;
+
             await stateMachine.FireAsync(trigger);
-            var toState = stateMachine.State;
 
             _logger.LogInformation("State transition successful for case {CaseNumber}: {FromState} -> {ToState} via {Trigger}", 
-                lodCase.CaseNumber, fromState, toState, trigger);
+                lodCase.CaseNumber, fromState, stateMachine.State, trigger);
 
             // Update case state
-            lodCase.CurrentState = toState;
+            lodCase.CurrentState = stateMachine.State;
             lodCase.LastModifiedDate = DateTime.UtcNow;
             await _dataService.UpdateCaseAsync(lodCase);
 
             // Record transition
-            var authority = GetCurrentAuthority(toState);
+            var authority = GetCurrentAuthority(stateMachine.State);
+
             await _dataService.AddTransitionHistoryAsync(new StateTransitionHistory
             {
-                LodCaseId = caseId,
-                FromState = fromState.ToString(),
-                ToState = toState.ToString(),
-                Trigger = trigger.ToString(),
+                CaseId = lodCase.Id,
+                FromState = fromState,
+                ToState = stateMachine.State,
+                Trigger = trigger,
                 Timestamp = DateTime.UtcNow,
                 PerformedByAuthority = authority,
                 Notes = notes
-            });
-
-            // Send notification about state change
-            await _notificationService.NotifyAsync(new NotificationRequest
-            {
-                Recipient = "LOD Manager",
-                Subject = $"State Transition - Case {lodCase.CaseNumber}",
-                Message = $"Case {lodCase.CaseNumber} transitioned from {fromState} to {toState} via trigger {trigger}. Authority: {authority}",
-                NotificationType = "System"
             });
         }
 
         public async Task<List<StateTransitionHistory>> GetCaseHistoryAsync(int caseId)
         {
-            return await _dataService.GetCaseHistoryAsync(caseId);
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(caseId);
+            
+            return await _dataService.GetTransitionHistoryAsync(caseId);
         }
 
         public async Task<List<string>> GetPermittedTriggersAsync(int caseId)
         {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(caseId);
+
             var lodCase = await GetCaseAsync(caseId);
 
             if (lodCase == null)
@@ -160,11 +153,14 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
             }
 
             var stateMachine = _stateMachineFactory.CreateStateMachine(lodCase);
+
             return [.. (await stateMachine.PermittedTriggersAsync).Select(t => t.ToString())];
         }
 
         public async Task<bool> CanFireAsync(int caseId, LodTrigger trigger)
         {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(caseId);
+
             var lodCase = await GetCaseAsync(caseId);
 
             if (lodCase == null)
@@ -179,14 +175,16 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
 
         public async Task<ValidationResult> ValidateTransitionAsync(int caseId, LodTrigger trigger)
         {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(caseId);
+
             var lodCase = await GetCaseAsync(caseId) ?? throw new CaseNotFoundException(caseId);
 
             return await _validator.ValidateTransitionAsync(lodCase, trigger);
         }
 
-        public string GetCurrentAuthority(LodState state)
+        public LodAuthority GetCurrentAuthority(LodState state)
         {
-            return _stateToAuthorityMap.GetValueOrDefault(state, LodAuthority.None).ToString();
+            return _stateToAuthorityMap.GetValueOrDefault(state, LodAuthority.None);
         }
     }
 }

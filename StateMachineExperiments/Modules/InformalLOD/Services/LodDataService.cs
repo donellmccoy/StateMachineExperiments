@@ -8,18 +8,23 @@ using System.Threading.Tasks;
 
 namespace StateMachineExperiments.Modules.InformalLOD.Services
 {
-    public class LodDataService : ILodDataService
+    public class InformalLineOfDutyService : IInformalLineOfDutyDataService
     {
-        private readonly LodDbContext _context;
+        private readonly IDbContextFactory<LodDbContext> _contextFactory;
 
-        public LodDataService(LodDbContext context)
+        public InformalLineOfDutyService(IDbContextFactory<LodDbContext> contextFactory)
         {
-            _context = context;
+            _contextFactory = contextFactory;
         }
 
-        public async Task<InformalLineOfDuty> CreateNewCaseAsync(string caseNumber, string? memberId = null, string? memberName = null)
+        public async Task<InformalLineOfDuty> CreateNewCaseAsync(string caseNumber, string memberId, string? memberName = null)
         {
-            var entity = _context.LodCases.Add(new InformalLineOfDuty
+            ArgumentException.ThrowIfNullOrWhiteSpace(caseNumber);
+            ArgumentException.ThrowIfNullOrWhiteSpace(memberId);
+
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            
+            var entity = context.LodCases.Add(new InformalLineOfDuty
             {
                 CaseNumber = caseNumber,
                 MemberId = memberId,
@@ -29,41 +34,63 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
                 LastModifiedDate = DateTime.UtcNow
             });
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
             return entity.Entity;
         }
 
         public async Task<InformalLineOfDuty?> GetCaseAsync(int caseId)
         {
-            return await _context.LodCases
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(caseId);
+            
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            
+            return await context.LodCases
                 .Include(c => c.TransitionHistory)
                 .FirstOrDefaultAsync(c => c.Id == caseId);
         }
 
         public async Task<InformalLineOfDuty?> GetCaseByCaseNumberAsync(string caseNumber)
         {
-            return await _context.LodCases
+            ArgumentException.ThrowIfNullOrWhiteSpace(caseNumber);
+            
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            
+            return await context.LodCases
                 .Include(c => c.TransitionHistory)
                 .FirstOrDefaultAsync(c => c.CaseNumber == caseNumber);
         }
 
         public async Task UpdateCaseAsync(InformalLineOfDuty lodCase)
         {
-            _context.LodCases.Update(lodCase);
-            await _context.SaveChangesAsync();
+            ArgumentNullException.ThrowIfNull(lodCase);
+            
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            
+            context.LodCases.Update(lodCase);
+            
+            await context.SaveChangesAsync();
         }
 
         public async Task AddTransitionHistoryAsync(StateTransitionHistory history)
         {
-            _context.TransitionHistory.Add(history);
-            await _context.SaveChangesAsync();
+            ArgumentNullException.ThrowIfNull(history);
+            
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            
+            context.TransitionHistory.Add(history);
+
+            await context.SaveChangesAsync();
         }
 
-        public async Task<List<StateTransitionHistory>> GetCaseHistoryAsync(int caseId)
+        public async Task<List<StateTransitionHistory>> GetTransitionHistoryAsync(int caseId)
         {
-            return await _context.TransitionHistory
-                .Where(h => h.LodCaseId == caseId)
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(caseId);
+
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            
+            return await context.TransitionHistory
+                .Where(h => h.CaseId == caseId)
                 .OrderBy(h => h.Timestamp)
                 .ToListAsync();
         }

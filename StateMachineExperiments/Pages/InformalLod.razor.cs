@@ -15,7 +15,7 @@ namespace StateMachineExperiments.Pages
         public required ILodStateMachineService LodService { get; set; }
 
         [Inject]
-        public required ILodDataService DataService { get; set; }
+        public required IInformalLineOfDutyDataService DataService { get; set; }
 
         [Inject]
         public required ILogger<InformalLod> Logger { get; set; }

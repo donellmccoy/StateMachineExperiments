@@ -42,6 +42,14 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
         Task FireTriggerAsync(int caseId, LodTrigger trigger, string? notes = null);
         
         /// <summary>
+        /// Fires a trigger to transition the case to a new state.
+        /// </summary>
+        /// <param name="lodCase">The LOD case instance to transition.</param>
+        /// <param name="trigger">The trigger to fire.</param>
+        /// <param name="notes">Optional notes about the transition.</param>
+        Task FireTriggerAsync(InformalLineOfDuty lodCase, LodTrigger trigger, string? notes = null);
+        
+        /// <summary>
         /// Retrieves the complete transition history for a case.
         /// </summary>
         /// <param name="caseId">The ID of the case.</param>
@@ -75,8 +83,8 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
         /// Determines the authority level responsible for a given state.
         /// </summary>
         /// <param name="state">The LOD state.</param>
-        /// <returns>String representation of the responsible authority.</returns>
-        string GetCurrentAuthority(LodState state);
+        /// <returns>The responsible authority.</returns>
+        LodAuthority GetCurrentAuthority(LodState state);
     }
 }
 

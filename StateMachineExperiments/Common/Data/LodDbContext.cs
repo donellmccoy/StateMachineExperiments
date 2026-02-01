@@ -45,7 +45,7 @@ namespace StateMachineExperiments.Common.Data
                 // Configure relationship
                 entity.HasOne(e => e.LodCase)
                     .WithMany(c => c.TransitionHistory)
-                    .HasForeignKey(e => e.LodCaseId)
+                    .HasForeignKey(e => e.CaseId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
 

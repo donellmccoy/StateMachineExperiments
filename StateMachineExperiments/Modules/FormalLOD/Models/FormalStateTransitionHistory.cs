@@ -10,11 +10,11 @@ namespace StateMachineExperiments.Modules.FormalLOD.Models
     {
         public int Id { get; set; }
         public int FormalLodCaseId { get; set; }
-        public string FromState { get; set; } = string.Empty;
-        public string ToState { get; set; } = string.Empty;
-        public string Trigger { get; set; } = string.Empty;
+        public FormalLodState FromState { get; set; }
+        public FormalLodState ToState { get; set; }
+        public FormalLodTrigger Trigger { get; set; }
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
-        public string? PerformedByAuthority { get; set; }
+        public FormalLodAuthority PerformedByAuthority { get; set; }
         public string? Notes { get; set; }
         
         // Navigation property

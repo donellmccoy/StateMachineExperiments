@@ -17,13 +17,13 @@ namespace StateMachineExperiments.Modules.InformalLOD
     {
         private readonly ILodStateMachineService _service;
         private readonly ILodBusinessRuleService _businessRules;
-        private readonly ILodDataService _dataService;
+        private readonly IInformalLineOfDutyDataService _dataService;
         private readonly ILodVisualizationService _visualization;
 
         public InformalLodModule(
             ILodStateMachineService service,
             ILodBusinessRuleService businessRules,
-            ILodDataService dataService,
+            IInformalLineOfDutyDataService dataService,
             ILodVisualizationService visualization)
         {
             _service = service;
