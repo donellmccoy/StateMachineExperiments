@@ -2,56 +2,196 @@
 
 <PageTitle>State Machine Experiments - Home</PageTitle>
 
-<div class="card">
-    <h1>🎯 State Machine Experiments</h1>
-    <h2>Line of Duty (LOD) Case Management System</h2>
+<RadzenStack Gap="1.5rem">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Gap="0.5rem">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenIcon Icon="account_tree" IconStyle="IconStyle.Primary" Style="font-size: 3rem;" />
+                <RadzenStack Gap="0">
+                    <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" class="rz-mb-0">
+                        State Machine Experiments
+                    </RadzenText>
+                    <RadzenText TextStyle="TextStyle.H6" class="rz-color-secondary">
+                        Line of Duty (LOD) Case Management System
+                    </RadzenText>
+                </RadzenStack>
+            </RadzenStack>
+            
+            <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" class="rz-mt-3">
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Start">
+                    <RadzenIcon Icon="celebration" />
+                    <RadzenStack Gap="0">
+                        <RadzenText TextStyle="TextStyle.Subtitle1"><strong>Welcome!</strong></RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body2">
+                            This application demonstrates a modular state machine architecture for managing Line of Duty cases with modern Radzen Blazor components.
+                        </RadzenText>
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenAlert>
+        </RadzenStack>
+    </RadzenCard>
 
-    <div class="alert alert-info">
-        <strong>Welcome!</strong> This application demonstrates a modular state machine architecture for managing Line of Duty cases.
-    </div>
+    <RadzenRow Gap="1.5rem">
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenCard Variant="Variant.Outlined" Style="height: 100%;">
+                <RadzenStack Gap="1rem">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                        <RadzenIcon Icon="assignment" IconStyle="IconStyle.Info" Style="font-size: 2rem;" />
+                        <RadzenText TextStyle="TextStyle.H6" class="rz-mb-0">Quick Start</RadzenText>
+                    </RadzenStack>
+                    
+                    <RadzenText TextStyle="TextStyle.Body1">Navigate to:</RadzenText>
+                    
+                    <RadzenStack Gap="0.5rem">
+                        <RadzenButton 
+                            Icon="assignment" 
+                            Text="Informal LOD Cases" 
+                            ButtonStyle="ButtonStyle.Primary" 
+                            Variant="Variant.Outlined"
+                            Click="@(() => NavigateTo("/informal-lod"))"
+                            Style="width: 100%; justify-content: start;" />
+                        <RadzenText TextStyle="TextStyle.Caption" class="rz-ml-4">
+                            Create and manage informal Line of Duty cases
+                        </RadzenText>
+                        
+                        <RadzenButton 
+                            Icon="gavel" 
+                            Text="Formal LOD Cases" 
+                            ButtonStyle="ButtonStyle.Secondary" 
+                            Variant="Variant.Outlined"
+                            Click="@(() => NavigateTo("/formal-lod"))"
+                            Style="width: 100%; justify-content: start;" 
+                            class="rz-mt-2" />
+                        <RadzenText TextStyle="TextStyle.Caption" class="rz-ml-4">
+                            Create and manage formal Line of Duty cases with appeals
+                        </RadzenText>
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
 
-    <h3>Features</h3>
-    <ul>
-        <li><strong>Informal LOD Workflow</strong> - Simplified process for straightforward cases</li>
-        <li><strong>Formal LOD Workflow</strong> - Comprehensive process with medical reviews and appeals</li>
-        <li><strong>State Machine Pattern</strong> - Using the Stateless library for robust workflow management</li>
-        <li><strong>Entity Framework Core</strong> - In-memory database for case persistence</li>
-        <li><strong>Async Operations</strong> - Non-blocking state transitions and notifications</li>
-    </ul>
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenCard Variant="Variant.Outlined" Style="height: 100%;">
+                <RadzenStack Gap="1rem">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                        <RadzenIcon Icon="stars" IconStyle="IconStyle.Success" Style="font-size: 2rem;" />
+                        <RadzenText TextStyle="TextStyle.H6" class="rz-mb-0">Features</RadzenText>
+                    </RadzenStack>
+                    
+                    <RadzenStack Gap="0.75rem">
+                        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Start">
+                            <RadzenIcon Icon="check_circle" IconStyle="IconStyle.Success" />
+                            <RadzenStack Gap="0">
+                                <RadzenText TextStyle="TextStyle.Subtitle2">Informal LOD Workflow</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Caption">Simplified process for straightforward cases</RadzenText>
+                            </RadzenStack>
+                        </RadzenStack>
+                        
+                        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Start">
+                            <RadzenIcon Icon="check_circle" IconStyle="IconStyle.Success" />
+                            <RadzenStack Gap="0">
+                                <RadzenText TextStyle="TextStyle.Subtitle2">Formal LOD Workflow</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Caption">Comprehensive process with medical reviews</RadzenText>
+                            </RadzenStack>
+                        </RadzenStack>
+                        
+                        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Start">
+                            <RadzenIcon Icon="check_circle" IconStyle="IconStyle.Success" />
+                            <RadzenStack Gap="0">
+                                <RadzenText TextStyle="TextStyle.Subtitle2">State Machine Pattern</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Caption">Stateless library for robust workflows</RadzenText>
+                            </RadzenStack>
+                        </RadzenStack>
+                        
+                        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Start">
+                            <RadzenIcon Icon="check_circle" IconStyle="IconStyle.Success" />
+                            <RadzenStack Gap="0">
+                                <RadzenText TextStyle="TextStyle.Subtitle2">Modern UI</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Caption">Radzen Blazor component library</RadzenText>
+                            </RadzenStack>
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
 
-    <h3>Quick Start</h3>
-    <div class="card">
-        <p><strong>Navigate to:</strong></p>
-        <ul>
-            <li><a href="/informal-lod"><strong>Informal LOD</strong></a> - Create and manage informal Line of Duty cases</li>
-            <li><a href="/formal-lod"><strong>Formal LOD</strong></a> - Create and manage formal Line of Duty cases with appeals</li>
-        </ul>
-    </div>
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Gap="1rem">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenIcon Icon="architecture" IconStyle="IconStyle.Warning" Style="font-size: 2rem;" />
+                <RadzenText TextStyle="TextStyle.H6" class="rz-mb-0">Architecture Highlights</RadzenText>
+            </RadzenStack>
 
-    <h3>Architecture Highlights</h3>
-    <div class="card">
-        <h4>Modular Design</h4>
-        <p>Each workflow module is self-contained with its own:</p>
-        <ul>
-            <li>Domain Models (State enums, entities)</li>
-            <li>Services (Data access, business rules, state machine management)</li>
-            <li>Events (Domain events for state transitions)</li>
-        </ul>
+            <RadzenTabs>
+                <Tabs>
+                    <RadzenTabsItem Text="Modular Design" Icon="widgets">
+                        <RadzenCard class="rz-mt-3">
+                            <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-2">
+                                Each workflow module is self-contained with its own:
+                            </RadzenText>
+                            <RadzenStack Gap="0.5rem">
+                                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Primary" Text="Models" />
+                                    <RadzenText TextStyle="TextStyle.Body2">State enums, entities, and domain types</RadzenText>
+                                </RadzenStack>
+                                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Text="Services" />
+                                    <RadzenText TextStyle="TextStyle.Body2">Data access, business rules, state machines</RadzenText>
+                                </RadzenStack>
+                                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Info" Text="Events" />
+                                    <RadzenText TextStyle="TextStyle.Body2">Domain events for state transitions</RadzenText>
+                                </RadzenStack>
+                            </RadzenStack>
+                        </RadzenCard>
+                    </RadzenTabsItem>
 
-        <h4>Type-Safe State Management</h4>
-        <p>Enum-based states eliminate string parsing and provide compile-time safety:</p>
-        <ul>
-            <li>LodState / FormalLodState (state enums)</li>
-            <li>LodTrigger / FormalLodTrigger (trigger enums)</li>
-            <li>Direct enum comparisons throughout the codebase</li>
-        </ul>
+                    <RadzenTabsItem Text="Type-Safe State" Icon="security">
+                        <RadzenCard class="rz-mt-3">
+                            <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-2">
+                                Enum-based states provide compile-time safety:
+                            </RadzenText>
+                            <RadzenStack Gap="0.5rem">
+                                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="States" />
+                                    <RadzenText TextStyle="TextStyle.Body2">LodState / FormalLodState enums</RadzenText>
+                                </RadzenStack>
+                                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="Triggers" />
+                                    <RadzenText TextStyle="TextStyle.Body2">LodTrigger / FormalLodTrigger enums</RadzenText>
+                                </RadzenStack>
+                                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="Authority" />
+                                    <RadzenText TextStyle="TextStyle.Body2">LodAuthority / FormalLodAuthority enums</RadzenText>
+                                </RadzenStack>
+                            </RadzenStack>
+                        </RadzenCard>
+                    </RadzenTabsItem>
 
-        <h4>Async Event Handling</h4>
-        <p>All state machine callbacks use async patterns:</p>
-        <ul>
-            <li>OnEntryAsync for state entry actions</li>
-            <li>OnExitAsync for state exit actions</li>
-            <li>Non-blocking notification service integration</li>
-        </ul>
-    </div>
-</div>
+                    <RadzenTabsItem Text="Async Patterns" Icon="sync">
+                        <RadzenCard class="rz-mt-3">
+                            <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-2">
+                                All state machine operations use async patterns:
+                            </RadzenText>
+                            <RadzenStack Gap="0.5rem">
+                                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Warning" Text="OnEntryAsync" />
+                                    <RadzenText TextStyle="TextStyle.Body2">State entry actions</RadzenText>
+                                </RadzenStack>
+                                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Warning" Text="OnExitAsync" />
+                                    <RadzenText TextStyle="TextStyle.Body2">State exit actions</RadzenText>
+                                </RadzenStack>
+                                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Warning" Text="Non-blocking" />
+                                    <RadzenText TextStyle="TextStyle.Body2">Notification service integration</RadzenText>
+                                </RadzenStack>
+                            </RadzenStack>
+                        </RadzenCard>
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
+        </RadzenStack>
+    </RadzenCard>
+</RadzenStack>

@@ -2,95 +2,189 @@
 
 <PageTitle>Informal LOD Cases</PageTitle>
 
-<div class="card">
-    <h1>📋 Informal Line of Duty Cases</h1>
-    <p>Manage informal LOD cases with a complete workflow process.</p>
-</div>
+<RadzenStack Gap="1rem">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+            <RadzenIcon Icon="assignment" IconStyle="IconStyle.Primary" Style="font-size: 2rem;" />
+            <RadzenStack Gap="0">
+                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H1" class="rz-mb-0">Informal Line of Duty Cases</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2">Manage informal LOD cases with a complete workflow process</RadzenText>
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
 
-@if (isLoading)
-{
-    <div class="loading">
-        <p>Loading...</p>
-    </div>
-}
-else
-{
-    <div class="card">
-        <h2>Create New Case</h2>
-        <div class="form-group">
-            <label>Case Number</label>
-            <input type="text" @bind="newCaseNumber" placeholder="Enter case number (e.g. LOD-2026-001)" />
-        </div>
-        <div class="form-group">
-            <label>Member ID</label>
-            <input type="text" @bind="newMemberId" placeholder="Enter member ID" />
-        </div>
-        <div class="form-group">
-            <label>Member Name</label>
-            <input type="text" @bind="newMemberName" placeholder="Enter member name" />
-        </div>
-        <button class="btn btn-success" @onclick="CreateNewCase">Create Case</button>
-    </div>
-
-    @if (!string.IsNullOrEmpty(message))
+    @if (isLoading)
     {
-        <div class="alert @messageClass">
-            @message
-        </div>
+        <RadzenCard>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" class="rz-p-4">
+                <RadzenProgressBarCircular ShowValue="false" Mode="ProgressBarMode.Indeterminate" Size="ProgressBarCircularSize.Medium" />
+                <RadzenText>Loading cases...</RadzenText>
+            </RadzenStack>
+        </RadzenCard>
     }
-
-    @if (selectedCase != null)
+    else
     {
-        <div class="card">
-            <h2>Case: @selectedCase.CaseNumber</h2>
-            <p><strong>Current State:</strong> <span class="state-badge state-progress">@selectedCase.CurrentState</span></p>
-            <p><strong>Member:</strong> @selectedCase.MemberName (@selectedCase.MemberId)</p>
-            <p><strong>Created:</strong> @selectedCase.CreatedDate.ToString("g")</p>
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenStack Gap="1rem">
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2">
+                    <RadzenIcon Icon="add_circle_outline" /> Create New Case
+                </RadzenText>
+                
+                <RadzenRow Gap="1rem">
+                    <RadzenColumn Size="12" SizeMD="4">
+                        <RadzenFormField Text="Case Number" Variant="Variant.Outlined">
+                            <RadzenTextBox @bind-Value="newCaseNumber" Placeholder="e.g., LOD-2026-001" Style="width: 100%;" />
+                        </RadzenFormField>
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="4">
+                        <RadzenFormField Text="Member ID" Variant="Variant.Outlined">
+                            <RadzenTextBox @bind-Value="newMemberId" Placeholder="Enter member ID" Style="width: 100%;" />
+                        </RadzenFormField>
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="4">
+                        <RadzenFormField Text="Member Name" Variant="Variant.Outlined">
+                            <RadzenTextBox @bind-Value="newMemberName" Placeholder="Enter member name" Style="width: 100%;" />
+                        </RadzenFormField>
+                    </RadzenColumn>
+                </RadzenRow>
+                
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                    <RadzenButton Icon="add" Text="Create Case" ButtonStyle="ButtonStyle.Success" Click="CreateNewCase" />
+                    <RadzenButton Icon="refresh" Text="Refresh List" ButtonStyle="ButtonStyle.Light" Click="LoadAllCases" />
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenCard>
 
-            <h3>Available Triggers</h3>
-            @if (permittedTriggers.Any())
-            {
-                <div>
-                    @foreach (var trigger in permittedTriggers)
-                    {
-                        <button class="btn" @onclick="() => FireTrigger(trigger)">@trigger</button>
-                    }
-                </div>
-            }
-            else
-            {
-                <p>No available actions in current state.</p>
-            }
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" class="rz-mb-3">
+                <RadzenIcon Icon="list" /> All Cases
+            </RadzenText>
+            
+            <RadzenDataGrid @ref="casesGrid" Data="@allCases" TItem="InformalLineOfDuty" 
+                           AllowFiltering="true" AllowSorting="true" AllowPaging="true" PageSize="10"
+                           FilterMode="FilterMode.Simple" SelectionMode="DataGridSelectionMode.Single"
+                           @bind-Value="@selectedCases" RowSelect="OnCaseSelected"
+                           EmptyText="No cases found. Create a new case to get started.">
+                <Columns>
+                    <RadzenDataGridColumn TItem="InformalLineOfDuty" Property="CaseNumber" Title="Case Number" Width="150px">
+                        <Template Context="lodCase">
+                            <RadzenBadge BadgeStyle="BadgeStyle.Info" Text="@lodCase.CaseNumber" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="InformalLineOfDuty" Property="MemberName" Title="Member" Width="200px" />
+                    <RadzenDataGridColumn TItem="InformalLineOfDuty" Property="MemberId" Title="Member ID" Width="150px" />
+                    <RadzenDataGridColumn TItem="InformalLineOfDuty" Property="CurrentState" Title="Current State" Width="180px">
+                        <Template Context="lodCase">
+                            <RadzenBadge BadgeStyle="@GetStateBadgeStyle(lodCase.CurrentState)" Text="@lodCase.CurrentState.ToString()" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="InformalLineOfDuty" Property="CreatedDate" Title="Created" Width="150px" FormatString="{0:d}" />
+                    <RadzenDataGridColumn TItem="InformalLineOfDuty" Property="LastModifiedDate" Title="Last Modified" Width="150px" FormatString="{0:d}" />
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenCard>
 
-            <h3>Transition History</h3>
-            @if (caseHistory.Any())
-            {
-                <table class="transition-history">
-                    <thead>
-                        <tr>
-                            <th>From State</th>
-                            <th>To State</th>
-                            <th>Trigger</th>
-                            <th>Timestamp</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var transition in caseHistory.OrderByDescending(t => t.Timestamp))
-                        {
-                            <tr>
-                                <td>@transition.FromState</td>
-                                <td>@transition.ToState</td>
-                                <td>@transition.Trigger</td>
-                                <td>@transition.Timestamp.ToString("g")</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            }
-            else
-            {
-                <p>No transitions yet.</p>
-            }
-        </div>
+        @if (selectedCase != null)
+        {
+            <RadzenCard Variant="Variant.Outlined">
+                <RadzenStack Gap="1rem">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                        <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mb-0">
+                            Case Details: @selectedCase.CaseNumber
+                        </RadzenText>
+                        <RadzenBadge BadgeStyle="@GetStateBadgeStyle(selectedCase.CurrentState)" 
+                                    Text="@selectedCase.CurrentState.ToString()" 
+                                    Style="font-size: 1rem; padding: 0.5rem 1rem;" />
+                    </RadzenStack>
+
+                    <RadzenTabs>
+                        <Tabs>
+                            <RadzenTabsItem Text="Case Information" Icon="info">
+                                <RadzenCard class="rz-mt-3">
+                                    <RadzenRow Gap="1rem">
+                                        <RadzenColumn Size="12" SizeMD="6">
+                                            <RadzenText TextStyle="TextStyle.Overline">Member Name</RadzenText>
+                                            <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-2">@selectedCase.MemberName</RadzenText>
+                                            
+                                            <RadzenText TextStyle="TextStyle.Overline">Member ID</RadzenText>
+                                            <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-2">@selectedCase.MemberId</RadzenText>
+                                        </RadzenColumn>
+                                        <RadzenColumn Size="12" SizeMD="6">
+                                            <RadzenText TextStyle="TextStyle.Overline">Created Date</RadzenText>
+                                            <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-2">@selectedCase.CreatedDate.ToString("f")</RadzenText>
+                                            
+                                            <RadzenText TextStyle="TextStyle.Overline">Last Modified</RadzenText>
+                                            <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-2">@selectedCase.LastModifiedDate.ToString("f")</RadzenText>
+                                        </RadzenColumn>
+                                    </RadzenRow>
+                                </RadzenCard>
+                            </RadzenTabsItem>
+
+                            <RadzenTabsItem Text="Available Actions" Icon="play_arrow">
+                                <RadzenCard class="rz-mt-3">
+                                    @if (permittedTriggers.Any())
+                                    {
+                                        <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-3">
+                                            The following actions are available in the current state:
+                                        </RadzenText>
+                                        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" Wrap="FlexWrap.Wrap">
+                                            @foreach (var trigger in permittedTriggers)
+                                            {
+                                                <RadzenButton Icon="send" Text="@trigger" 
+                                                            ButtonStyle="ButtonStyle.Primary" 
+                                                            Click="() => ShowTriggerConfirmation(trigger)" />
+                                            }
+                                        </RadzenStack>
+                                    }
+                                    else
+                                    {
+                                        <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter">
+                                            <RadzenIcon Icon="info" /> No actions available in the current state.
+                                        </RadzenAlert>
+                                    }
+                                </RadzenCard>
+                            </RadzenTabsItem>
+
+                            <RadzenTabsItem Text="Transition History" Icon="history">
+                                <RadzenCard class="rz-mt-3">
+                                    @if (caseHistory.Any())
+                                    {
+                                        <RadzenDataGrid Data="@caseHistory.OrderByDescending(t => t.Timestamp)" TItem="StateTransitionHistory" 
+                                                       AllowSorting="true" AllowPaging="true" PageSize="10">
+                                            <Columns>
+                                                <RadzenDataGridColumn TItem="StateTransitionHistory" Property="FromState" Title="From State" Width="150px">
+                                                    <Template Context="transition">
+                                                        <RadzenBadge BadgeStyle="BadgeStyle.Light" Text="@transition.FromState.ToString()" />
+                                                    </Template>
+                                                </RadzenDataGridColumn>
+                                                <RadzenDataGridColumn TItem="StateTransitionHistory" Property="ToState" Title="To State" Width="150px">
+                                                    <Template Context="transition">
+                                                        <RadzenBadge BadgeStyle="@GetStateBadgeStyle(transition.ToState)" Text="@transition.ToState.ToString()" />
+                                                    </Template>
+                                                </RadzenDataGridColumn>
+                                                <RadzenDataGridColumn TItem="StateTransitionHistory" Property="Trigger" Title="Trigger" Width="150px">
+                                                    <Template Context="transition">
+                                                        <RadzenBadge BadgeStyle="BadgeStyle.Info" Text="@transition.Trigger.ToString()" />
+                                                    </Template>
+                                                </RadzenDataGridColumn>
+                                                <RadzenDataGridColumn TItem="StateTransitionHistory" Property="PerformedByAuthority" Title="Authority" Width="150px" />
+                                                <RadzenDataGridColumn TItem="StateTransitionHistory" Property="Timestamp" Title="Timestamp" FormatString="{0:g}" />
+                                                <RadzenDataGridColumn TItem="StateTransitionHistory" Property="Notes" Title="Notes" />
+                                            </Columns>
+                                        </RadzenDataGrid>
+                                    }
+                                    else
+                                    {
+                                        <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter">
+                                            <RadzenIcon Icon="info" /> No transition history available for this case.
+                                        </RadzenAlert>
+                                    }
+                                </RadzenCard>
+                            </RadzenTabsItem>
+                        </Tabs>
+                    </RadzenTabs>
+                </RadzenStack>
+            </RadzenCard>
+        }
     }
-}
+</RadzenStack>

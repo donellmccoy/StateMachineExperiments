@@ -61,6 +61,15 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
                 .FirstOrDefaultAsync(c => c.CaseNumber == caseNumber);
         }
 
+        public async Task<IEnumerable<InformalLineOfDuty>> GetAllCasesAsync()
+        {
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            
+            return await context.LodCases
+                .Include(c => c.TransitionHistory)
+                .ToListAsync();
+        }
+
         public async Task UpdateCaseAsync(InformalLineOfDuty lodCase)
         {
             ArgumentNullException.ThrowIfNull(lodCase);

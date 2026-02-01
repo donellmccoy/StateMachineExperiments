@@ -28,6 +28,12 @@ var businessRulesSettings = new BusinessRulesSettings();
 builder.Configuration.GetSection("BusinessRules").Bind(businessRulesSettings);
 builder.Services.AddSingleton(businessRulesSettings);
 
+// Register Radzen services
+builder.Services.AddScoped<Radzen.DialogService>();
+builder.Services.AddScoped<Radzen.NotificationService>();
+builder.Services.AddScoped<Radzen.TooltipService>();
+builder.Services.AddScoped<Radzen.ContextMenuService>();
+
 // Register SMTP and notification services
 builder.Services.AddScoped<ISmtpService, SmtpService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();

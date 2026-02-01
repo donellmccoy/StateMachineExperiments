@@ -13,6 +13,7 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
         Task<InformalLineOfDuty> CreateNewCaseAsync(string caseNumber, string memberId, string? memberName = null);
         Task<InformalLineOfDuty?> GetCaseAsync(int caseId);
         Task<InformalLineOfDuty?> GetCaseByCaseNumberAsync(string caseNumber);
+        Task<IEnumerable<InformalLineOfDuty>> GetAllCasesAsync();
         Task UpdateCaseAsync(InformalLineOfDuty lodCase);
         Task AddTransitionHistoryAsync(StateTransitionHistory history);
         Task<List<StateTransitionHistory>> GetTransitionHistoryAsync(int caseId);

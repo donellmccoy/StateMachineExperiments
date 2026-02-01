@@ -13,6 +13,7 @@ namespace StateMachineExperiments.Modules.FormalLOD.Services
         Task<FormalLineOfDuty> CreateNewCaseAsync(string caseNumber, string? memberId = null, string? memberName = null, bool isDeathCase = false);
         Task<FormalLineOfDuty?> GetCaseAsync(int caseId);
         Task<FormalLineOfDuty?> GetCaseByCaseNumberAsync(string caseNumber);
+        Task<IEnumerable<FormalLineOfDuty>> GetAllCasesAsync();
         Task UpdateCaseAsync(FormalLineOfDuty lodCase);
         Task AddTransitionHistoryAsync(FormalStateTransitionHistory history);
         Task<List<FormalStateTransitionHistory>> GetCaseHistoryAsync(int caseId);

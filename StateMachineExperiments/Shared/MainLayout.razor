@@ -1,14 +1,35 @@
 @inherits LayoutComponentBase
 
-<div class="page">
-    <nav class="nav-menu">
-        <NavLink href="" Match="NavLinkMatch.All">Home</NavLink>
-        <NavLink href="informal-lod">Informal LOD</NavLink>
-        <NavLink href="formal-lod">Formal LOD</NavLink>
-        <NavLink href="about">About</NavLink>
-    </nav>
+<RadzenLayout>
+    <RadzenHeader>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0" class="rz-p-3">
+            <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenIcon Icon="account_tree" IconStyle="IconStyle.Primary" Style="font-size: 2rem;" />
+                <RadzenText TextStyle="TextStyle.H5" class="rz-mb-0" Style="color: var(--rz-primary);">
+                    LOD Case Management
+                </RadzenText>
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenHeader>
+    
+    <RadzenSidebar @bind-Expanded="@sidebarExpanded" Style="width: 250px;">
+        <RadzenPanelMenu>
+            <RadzenPanelMenuItem Text="Home" Icon="home" Path="/" />
+            <RadzenPanelMenuItem Text="Informal LOD" Icon="assignment" Path="/informal-lod" />
+            <RadzenPanelMenuItem Text="Formal LOD" Icon="gavel" Path="/formal-lod" />
+            <RadzenPanelMenuItem Text="About" Icon="info" Path="/about" />
+        </RadzenPanelMenu>
+    </RadzenSidebar>
+    
+    <RadzenBody>
+        <div class="rz-p-4">
+            @Body
+        </div>
+    </RadzenBody>
+</RadzenLayout>
 
-    <main>
-        @Body
-    </main>
-</div>
+<RadzenNotificationService />
+<RadzenDialogService />
+<RadzenContextMenuService />
+<RadzenTooltipService />

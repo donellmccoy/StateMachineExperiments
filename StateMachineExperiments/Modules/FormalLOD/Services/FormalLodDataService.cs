@@ -55,6 +55,15 @@ namespace StateMachineExperiments.Modules.FormalLOD.Services
                 .FirstOrDefaultAsync(c => c.CaseNumber == caseNumber);
         }
 
+        public async Task<IEnumerable<FormalLineOfDuty>> GetAllCasesAsync()
+        {
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            
+            return await context.FormalLodCases
+                .Include(c => c.TransitionHistory)
+                .ToListAsync();
+        }
+
         public async Task UpdateCaseAsync(FormalLineOfDuty lodCase)
         {
             await using var context = await _contextFactory.CreateDbContextAsync();
