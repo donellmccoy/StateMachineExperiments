@@ -137,7 +137,7 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
             }
         }
 
-        private async Task OnStateExitAsync(LodState state, InformalLineOfDuty lodCase)
+        private static async Task OnStateExitAsync(LodState state, InformalLineOfDuty lodCase)
         {
             Console.WriteLine($"[EXIT] Exiting state: {state} for case {lodCase.CaseNumber}");
             await Task.CompletedTask;

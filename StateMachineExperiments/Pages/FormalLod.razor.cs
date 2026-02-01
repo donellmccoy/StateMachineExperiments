@@ -1,6 +1,11 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
+using StateMachineExperiments.Common.Exceptions;
 using StateMachineExperiments.Modules.FormalLOD.Models;
 using StateMachineExperiments.Modules.FormalLOD.Services;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace StateMachineExperiments.Pages
 {
@@ -8,6 +13,9 @@ namespace StateMachineExperiments.Pages
     {
         [Inject]
         public required IFormalLodStateMachineService FormalLodService { get; set; }
+
+        [Inject]
+        public required ILogger<FormalLod> Logger { get; set; }
 
         private FormalLineOfDuty? selectedCase;
         private List<FormalStateTransitionHistory> caseHistory = new();
@@ -46,7 +54,8 @@ namespace StateMachineExperiments.Pages
             }
             catch (Exception ex)
             {
-                ShowMessage($"Error creating case: {ex.Message}", "alert-danger");
+                Logger.LogError(ex, "Error creating formal case {CaseNumber}", newCaseNumber);
+                ShowMessage($"Error creating case: {GetUserFriendlyErrorMessage(ex)}", "alert-danger");
             }
         }
 
@@ -61,10 +70,20 @@ namespace StateMachineExperiments.Pages
                     permittedTriggers = await FormalLodService.GetPermittedTriggersAsync(caseId);
                     message = string.Empty;
                 }
+                else
+                {
+                    ShowMessage("Case not found.", "alert-warning");
+                }
+            }
+            catch (CaseNotFoundException)
+            {
+                Logger.LogWarning("Formal case with ID {CaseId} not found", caseId);
+                ShowMessage("The requested case could not be found.", "alert-warning");
             }
             catch (Exception ex)
             {
-                ShowMessage($"Error loading case: {ex.Message}", "alert-danger");
+                Logger.LogError(ex, "Error loading formal case {CaseId}", caseId);
+                ShowMessage($"Error loading case: {GetUserFriendlyErrorMessage(ex)}", "alert-danger");
             }
         }
 
@@ -81,9 +100,20 @@ namespace StateMachineExperiments.Pages
                     await SelectCaseById(selectedCase.Id);
                 }
             }
+            catch (InvalidStateTransitionException ex)
+            {
+                Logger.LogWarning(ex, "Invalid state transition for formal case {CaseNumber}", selectedCase.CaseNumber);
+                ShowMessage($"This action is not available in the current state. Permitted actions: {string.Join(", ", permittedTriggers)}", "alert-warning");
+            }
+            catch (TransitionValidationException ex)
+            {
+                Logger.LogWarning(ex, "Transition validation failed for formal case {CaseNumber}", selectedCase.CaseNumber);
+                ShowMessage($"Validation failed: {ex.Message}", "alert-warning");
+            }
             catch (Exception ex)
             {
-                ShowMessage($"Error: {ex.Message}", "alert-danger");
+                Logger.LogError(ex, "Error firing trigger {Trigger} for formal case {CaseNumber}", triggerName, selectedCase.CaseNumber);
+                ShowMessage($"Error: {GetUserFriendlyErrorMessage(ex)}", "alert-danger");
             }
         }
 
@@ -91,6 +121,18 @@ namespace StateMachineExperiments.Pages
         {
             message = msg;
             messageClass = cssClass;
+        }
+
+        private string GetUserFriendlyErrorMessage(Exception ex)
+        {
+            return ex switch
+            {
+                CaseNotFoundException => "The case could not be found.",
+                InvalidStateTransitionException => "This action is not available in the current state.",
+                TransitionValidationException => ex.Message,
+                MissingRequiredDataException => $"Required information is missing: {ex.Message}",
+                _ => "An unexpected error occurred. Please try again."
+            };
         }
     }
 }

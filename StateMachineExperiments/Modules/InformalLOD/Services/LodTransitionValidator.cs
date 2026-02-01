@@ -6,11 +6,6 @@ using System.Threading.Tasks;
 
 namespace StateMachineExperiments.Modules.InformalLOD.Services
 {
-    public interface ILodTransitionValidator
-    {
-        Task<ValidationResult> ValidateTransitionAsync(InformalLineOfDuty lodCase, LodTrigger trigger);
-    }
-
     public class LodTransitionValidator : ILodTransitionValidator
     {
         private readonly ILodBusinessRuleService _businessRules;

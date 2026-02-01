@@ -222,3 +222,83 @@ h2 {
     padding: 40px;
     color: #7f8c8d;
 }
+
+/* Error Boundary Styles */
+.error-boundary {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 20px;
+}
+
+.error-content {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.error-content h2 {
+    color: #e74c3c;
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.error-message {
+    font-size: 16px;
+    color: #2c3e50;
+    line-height: 1.6;
+    margin: 20px 0;
+}
+
+.error-details {
+    margin: 20px 0;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 10px;
+    background: #f9f9f9;
+}
+
+.error-details summary {
+    cursor: pointer;
+    font-weight: bold;
+    color: #7f8c8d;
+    padding: 5px;
+}
+
+.error-details summary:hover {
+    color: #2c3e50;
+}
+
+.error-stack {
+    padding: 10px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: #555;
+}
+
+.error-stack pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    background: #fff;
+    padding: 10px;
+    border-radius: 4px;
+    overflow-x: auto;
+}
+
+.error-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
