@@ -18,18 +18,15 @@ namespace StateMachineExperiments.Modules.FormalLOD
         private readonly IFormalLodStateMachineService _service;
         private readonly IFormalLodBusinessRuleService _businessRules;
         private readonly IFormalLodDataService _dataService;
-        private readonly IEventPublisher _eventPublisher;
 
         public FormalLodModule(
             IFormalLodStateMachineService service,
             IFormalLodBusinessRuleService businessRules,
-            IFormalLodDataService dataService,
-            IEventPublisher eventPublisher)
+            IFormalLodDataService dataService)
         {
             _service = service;
             _businessRules = businessRules;
             _dataService = dataService;
-            _eventPublisher = eventPublisher;
         }
 
         /// <summary>
@@ -46,7 +43,6 @@ namespace StateMachineExperiments.Modules.FormalLOD
             await RunExpeditedDeathCaseAsync();
             await RunFormalCaseWithAppealAsync();
             await RunPersistenceScenarioAsync();
-            await ShowEventSummaryAsync();
         }
 
         private async Task RunStandardFormalCaseWithToxicologyAsync()
@@ -232,26 +228,6 @@ namespace StateMachineExperiments.Modules.FormalLOD
 
             await _service.FireTriggerAsync(loadedCase.Id, FormalLodTrigger.OfficerAppointed);
             Console.WriteLine($"✓ Resumed and advanced to: {(await _service.GetCaseAsync(loadedCase.Id))!.CurrentState}\n");
-        }
-
-        private async Task ShowEventSummaryAsync()
-        {
-            Console.WriteLine("\n╔═══════════════════════════════════════════════════════════╗");
-            Console.WriteLine("║  DEMONSTRATION: Published Domain Events                  ║");
-            Console.WriteLine("╚═══════════════════════════════════════════════════════════╝\n");
-
-            if (_eventPublisher is InMemoryEventPublisher inMemoryPublisher)
-            {
-                var events = inMemoryPublisher.GetPublishedEvents();
-                var formalEvents = events.Where(e => e.GetType().Namespace?.Contains("FormalLOD") == true).ToList();
-                
-                Console.WriteLine($"✓ Total Formal LOD events published: {formalEvents.Count}");
-                Console.WriteLine($"  - Case Created Events: {formalEvents.Count(e => e.GetType().Name.Contains("CaseCreated"))}");
-                Console.WriteLine($"  - State Changed Events: {formalEvents.Count(e => e.GetType().Name.Contains("StateChanged"))}");
-                Console.WriteLine($"  - Investigation Started Events: {formalEvents.Count(e => e.GetType().Name.Contains("InvestigationStarted"))}");
-                Console.WriteLine($"  - Determination Events: {formalEvents.Count(e => e.GetType().Name.Contains("Determination"))}");
-                Console.WriteLine($"  - Appeal Events: {formalEvents.Count(e => e.GetType().Name.Contains("Appeal"))}\n");
-            }
         }
     }
 }

@@ -16,7 +16,7 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
         private readonly ILodBusinessRuleService _businessRules;
         private readonly ILodTransitionValidator _validator;
         private readonly ILodStateMachineFactory _stateMachineFactory;
-        private readonly IEventPublisher _eventPublisher;
+        private readonly INotificationService _notificationService;
         private readonly Dictionary<LodState, LodAuthority> _stateToAuthorityMap;
 
         public LodStateMachineService(
@@ -24,13 +24,13 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
             ILodBusinessRuleService businessRules,
             ILodTransitionValidator validator,
             ILodStateMachineFactory stateMachineFactory,
-            IEventPublisher eventPublisher)
+            INotificationService notificationService)
         {
             _dataService = dataService;
             _businessRules = businessRules;
             _validator = validator;
             _stateMachineFactory = stateMachineFactory;
-            _eventPublisher = eventPublisher;
+            _notificationService = notificationService;
 
             _stateToAuthorityMap = new Dictionary<LodState, LodAuthority>
             {
@@ -53,14 +53,12 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
         {
             var lodCase = await _dataService.CreateNewCaseAsync(caseNumber, memberId, memberName);
 
-            // Publish domain event
-            _eventPublisher.Publish(new LodCaseCreatedEvent
-            {
-                CaseId = lodCase.Id,
-                CaseNumber = lodCase.CaseNumber,
-                MemberId = lodCase.MemberId,
-                MemberName = lodCase.MemberName
-            });
+            // Send notification to stakeholders
+            _notificationService.SendStakeholderAlert(
+                caseNumber: caseNumber,
+                alertType: "New LOD Case Created",
+                message: $"New informal LOD case {caseNumber} created for {memberName ?? "member"} ({memberId ?? "N/A"})",
+                stakeholders: new[] { "LOD Manager" });
 
             return lodCase;
         }
@@ -87,7 +85,7 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
             }
 
             var currentState = Enum.Parse<LodState>(lodCase.CurrentState);
-            var stateMachine = _stateMachineFactory.CreateStateMachine(lodCase, _eventPublisher);
+            var stateMachine = _stateMachineFactory.CreateStateMachine(lodCase, _notificationService);
 
             if (!stateMachine.CanFire(trigger))
             {
@@ -117,17 +115,12 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
                 Notes = notes
             });
 
-            // Publish state changed event
-            _eventPublisher.Publish(new LodStateChangedEvent
-            {
-                CaseId = caseId,
-                CaseNumber = lodCase.CaseNumber,
-                FromState = fromState,
-                ToState = toState,
-                Trigger = trigger.ToString(),
-                Authority = authority,
-                Notes = notes
-            });
+            // Send notification about state change
+            _notificationService.SendNotification(
+                recipient: "LOD Manager",
+                subject: $"State Transition - Case {lodCase.CaseNumber}",
+                message: $"Case {lodCase.CaseNumber} transitioned from {fromState} to {toState} via trigger {trigger}. Authority: {authority}",
+                notificationType: "System");
 
             Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] Transition: {fromState} -> {toState} | Trigger: {trigger}");
         }
@@ -146,7 +139,7 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
                 return [];
             }
 
-            var stateMachine = _stateMachineFactory.CreateStateMachine(lodCase, _eventPublisher);
+            var stateMachine = _stateMachineFactory.CreateStateMachine(lodCase, _notificationService);
             return [.. (await stateMachine.PermittedTriggersAsync).Select(t => t.ToString())];
         }
 

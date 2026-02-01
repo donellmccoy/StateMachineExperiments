@@ -16,7 +16,7 @@ namespace StateMachineExperiments.Modules.FormalLOD.Services
         private readonly IFormalLodBusinessRuleService _businessRules;
         private readonly IFormalLodTransitionValidator _validator;
         private readonly IFormalLodStateMachineFactory _stateMachineFactory;
-        private readonly IEventPublisher _eventPublisher;
+        private readonly INotificationService _notificationService;
         private readonly Dictionary<FormalLodState, FormalLodAuthority> _stateToAuthorityMap;
 
         public FormalLodStateMachineService(
@@ -24,13 +24,13 @@ namespace StateMachineExperiments.Modules.FormalLOD.Services
             IFormalLodBusinessRuleService businessRules,
             IFormalLodTransitionValidator validator,
             IFormalLodStateMachineFactory stateMachineFactory,
-            IEventPublisher eventPublisher)
+            INotificationService notificationService)
         {
             _dataService = dataService;
             _businessRules = businessRules;
             _validator = validator;
             _stateMachineFactory = stateMachineFactory;
-            _eventPublisher = eventPublisher;
+            _notificationService = notificationService;
 
             _stateToAuthorityMap = new Dictionary<FormalLodState, FormalLodAuthority>
             {
@@ -53,15 +53,12 @@ namespace StateMachineExperiments.Modules.FormalLOD.Services
         {
             var lodCase = await _dataService.CreateNewCaseAsync(caseNumber, memberId, memberName, isDeathCase);
 
-            // Publish domain event
-            _eventPublisher.Publish(new FormalLodCaseCreatedEvent
-            {
-                CaseId = lodCase.Id,
-                CaseNumber = lodCase.CaseNumber,
-                MemberId = lodCase.MemberId,
-                MemberName = lodCase.MemberName,
-                IsDeathCase = lodCase.IsDeathCase
-            });
+            // Send notification to stakeholders
+            _notificationService.SendStakeholderAlert(
+                caseNumber: caseNumber,
+                alertType: "New LOD Case Created",
+                message: $"New {(isDeathCase ? "DEATH" : "formal")} LOD case {caseNumber} created for {memberName ?? "member"} ({memberId ?? "N/A"})",
+                stakeholders: new[] { "LOD Manager", "Wing Commander" });
 
             return lodCase;
         }
@@ -88,7 +85,7 @@ namespace StateMachineExperiments.Modules.FormalLOD.Services
             }
 
             var currentState = Enum.Parse<FormalLodState>(lodCase.CurrentState);
-            var stateMachine = _stateMachineFactory.CreateStateMachine(lodCase, _eventPublisher);
+            var stateMachine = _stateMachineFactory.CreateStateMachine(lodCase, _notificationService);
 
             if (!stateMachine.CanFire(trigger))
             {
@@ -118,17 +115,12 @@ namespace StateMachineExperiments.Modules.FormalLOD.Services
                 Notes = notes
             });
 
-            // Publish state changed event
-            _eventPublisher.Publish(new FormalLodStateChangedEvent
-            {
-                CaseId = caseId,
-                CaseNumber = lodCase.CaseNumber,
-                FromState = fromState,
-                ToState = toState,
-                Trigger = trigger.ToString(),
-                Authority = authority,
-                Notes = notes
-            });
+            // Send notification about state change
+            _notificationService.SendNotification(
+                recipient: "LOD Manager",
+                subject: $"State Transition - Case {lodCase.CaseNumber}",
+                message: $"Case {lodCase.CaseNumber} transitioned from {fromState} to {toState} via trigger {trigger}. Authority: {authority}",
+                notificationType: "System");
 
             Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] Transition: {fromState} -> {toState} | Trigger: {trigger}");
         }
@@ -147,7 +139,7 @@ namespace StateMachineExperiments.Modules.FormalLOD.Services
                 return [];
             }
 
-            var stateMachine = _stateMachineFactory.CreateStateMachine(lodCase, _eventPublisher);
+            var stateMachine = _stateMachineFactory.CreateStateMachine(lodCase, _notificationService);
             return [.. (await stateMachine.PermittedTriggersAsync).Select(t => t.ToString())];
         }
 

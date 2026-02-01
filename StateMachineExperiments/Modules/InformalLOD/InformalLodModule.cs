@@ -19,20 +19,17 @@ namespace StateMachineExperiments.Modules.InformalLOD
         private readonly ILodBusinessRuleService _businessRules;
         private readonly ILodDataService _dataService;
         private readonly ILodVisualizationService _visualization;
-        private readonly IEventPublisher _eventPublisher;
 
         public InformalLodModule(
             ILodStateMachineService service,
             ILodBusinessRuleService businessRules,
             ILodDataService dataService,
-            ILodVisualizationService visualization,
-            IEventPublisher eventPublisher)
+            ILodVisualizationService visualization)
         {
             _service = service;
             _businessRules = businessRules;
             _dataService = dataService;
             _visualization = visualization;
-            _eventPublisher = eventPublisher;
         }
 
         /// <summary>
@@ -49,7 +46,6 @@ namespace StateMachineExperiments.Modules.InformalLOD
             await RunPersistenceScenarioAsync();
             await RunValidationDemoAsync();
             await RunVisualizationDemoAsync();
-            await ShowEventSummaryAsync();
         }
 
         private async Task RunComplexCaseScenarioAsync()
@@ -200,23 +196,6 @@ namespace StateMachineExperiments.Modules.InformalLOD
                 _visualization.SaveDotGraphToFile(case1, "informal_lod_state_machine.dot");
                 Console.WriteLine("✓ State machine diagram saved to: informal_lod_state_machine.dot");
                 Console.WriteLine("  (Use Graphviz: dot -Tpng informal_lod_state_machine.dot -o diagram.png)\n");
-            }
-        }
-
-        private async Task ShowEventSummaryAsync()
-        {
-            Console.WriteLine("\n╔═══════════════════════════════════════════════════════════╗");
-            Console.WriteLine("║  DEMONSTRATION: Published Domain Events                  ║");
-            Console.WriteLine("╚═══════════════════════════════════════════════════════════╝\n");
-
-            if (_eventPublisher is InMemoryEventPublisher inMemoryPublisher)
-            {
-                var events = inMemoryPublisher.GetPublishedEvents();
-                Console.WriteLine($"✓ Total events published: {events.Count}");
-                Console.WriteLine($"  - Case Created Events: {events.Count(e => e.GetType().Name.Contains("Created"))}");
-                Console.WriteLine($"  - State Changed Events: {events.Count(e => e.GetType().Name.Contains("StateChanged"))}");
-                Console.WriteLine($"  - Determination Events: {events.Count(e => e.GetType().Name.Contains("Determination"))}");
-                Console.WriteLine($"  - Appeal Events: {events.Count(e => e.GetType().Name.Contains("Appeal"))}\n");
             }
         }
     }

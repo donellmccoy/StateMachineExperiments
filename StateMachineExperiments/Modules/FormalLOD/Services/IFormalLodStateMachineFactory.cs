@@ -6,8 +6,6 @@ namespace StateMachineExperiments.Modules.FormalLOD.Services
 {
     public interface IFormalLodStateMachineFactory
     {
-        StateMachine<FormalLodState, FormalLodTrigger> CreateStateMachine(
-            FormalLineOfDuty lodCase, 
-            IEventPublisher? eventPublisher = null);
+        StateMachine<FormalLodState, FormalLodTrigger> CreateStateMachine(FormalLineOfDuty lodCase);
     }
 }

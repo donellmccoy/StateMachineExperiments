@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace StateMachineExperiments.Modules.InformalLOD.Tests
+namespace StateMachineExperiments.Tests.InformalLOD
 {
     public class LodStateMachineServiceTests
     {
@@ -17,7 +17,7 @@ namespace StateMachineExperiments.Modules.InformalLOD.Tests
         private readonly Mock<ILodBusinessRuleService> _mockBusinessRules;
         private readonly Mock<ILodTransitionValidator> _mockValidator;
         private readonly ILodStateMachineFactory _stateMachineFactory;
-        private readonly IEventPublisher _eventPublisher;
+        private readonly INotificationService _notificationService;
         private readonly LodStateMachineService _service;
 
         public LodStateMachineServiceTests()
@@ -25,15 +25,15 @@ namespace StateMachineExperiments.Modules.InformalLOD.Tests
             _mockDataService = new Mock<ILodDataService>();
             _mockBusinessRules = new Mock<ILodBusinessRuleService>();
             _mockValidator = new Mock<ILodTransitionValidator>();
-            _stateMachineFactory = new LodStateMachineFactory();
-            _eventPublisher = new InMemoryEventPublisher();
+            _notificationService = new NotificationService();
+            _stateMachineFactory = new LodStateMachineFactory(_notificationService);
 
             _service = new LodStateMachineService(
                 _mockDataService.Object,
                 _mockBusinessRules.Object,
                 _mockValidator.Object,
                 _stateMachineFactory,
-                _eventPublisher);
+                _notificationService);
         }
 
         [Fact]
@@ -158,4 +158,3 @@ namespace StateMachineExperiments.Modules.InformalLOD.Tests
         }
     }
 }
-

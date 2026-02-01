@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using Xunit;
 
-namespace StateMachineExperiments.Modules.InformalLOD.Tests
+namespace StateMachineExperiments.Tests.InformalLOD
 {
     public class LodBusinessRuleServiceTests
     {

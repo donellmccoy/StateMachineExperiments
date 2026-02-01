@@ -5,6 +5,8 @@ using StateMachineExperiments.Common.Data;
 using StateMachineExperiments.Common.Infrastructure;
 using StateMachineExperiments.Modules.InformalLOD;
 using StateMachineExperiments.Modules.InformalLOD.Services;
+using StateMachineExperiments.Modules.FormalLOD;
+using StateMachineExperiments.Modules.FormalLOD.Services;
 
 namespace StateMachineExperiments
 {
@@ -37,6 +39,11 @@ namespace StateMachineExperiments
             await RunInformalLodDemosAsync(context);
 
             // ===========================================
+            // Run Formal LOD Module Demonstrations
+            // ===========================================
+            await RunFormalLodDemosAsync(context);
+
+            // ===========================================
             // Show Database Summary
             // ===========================================
             await ShowDatabaseSummaryAsync(context);
@@ -49,10 +56,10 @@ namespace StateMachineExperiments
         private static async Task RunInformalLodDemosAsync(LodDbContext context)
         {
             // Setup dependency injection for Informal LOD module
+            INotificationService notificationService = new NotificationService();
             ILodDataService dataService = new LodDataService(context);
             ILodBusinessRuleService businessRules = new LodBusinessRuleService();
-            IEventPublisher eventPublisher = new InMemoryEventPublisher();
-            ILodStateMachineFactory stateMachineFactory = new LodStateMachineFactory();
+            ILodStateMachineFactory stateMachineFactory = new LodStateMachineFactory(notificationService);
             ILodTransitionValidator validator = new LodTransitionValidator(businessRules);
             ILodVisualizationService visualization = new LodVisualizationService(stateMachineFactory);
             
@@ -61,17 +68,41 @@ namespace StateMachineExperiments
                 businessRules, 
                 validator, 
                 stateMachineFactory, 
-                eventPublisher);
+                notificationService);
 
             // Create and run module
             var informalModule = new InformalLodModule(
                 service,
                 businessRules,
                 dataService,
-                visualization,
-                eventPublisher);
+                visualization);
 
             await informalModule.RunDemonstrationsAsync();
+        }
+
+        private static async Task RunFormalLodDemosAsync(LodDbContext context)
+        {
+            // Setup dependency injection for Formal LOD module
+            INotificationService notificationService = new NotificationService();
+            IFormalLodDataService dataService = new FormalLodDataService(context);
+            IFormalLodBusinessRuleService businessRules = new FormalLodBusinessRuleService();
+            IFormalLodStateMachineFactory stateMachineFactory = new FormalLodStateMachineFactory(notificationService);
+            IFormalLodTransitionValidator validator = new FormalLodTransitionValidator(businessRules);
+            
+            var service = new FormalLodStateMachineService(
+                dataService, 
+                businessRules, 
+                validator, 
+                stateMachineFactory, 
+                notificationService);
+
+            // Create and run module
+            var formalModule = new FormalLodModule(
+                service,
+                businessRules,
+                dataService);
+
+            await formalModule.RunDemonstrationsAsync();
         }
 
         private static async Task ShowDatabaseSummaryAsync(LodDbContext context)
@@ -80,14 +111,28 @@ namespace StateMachineExperiments
             Console.WriteLine("║  Database Summary                                         ║");
             Console.WriteLine("╚═══════════════════════════════════════════════════════════╝\n");
 
-            var totalCases = await context.LodCases.CountAsync();
-            var totalTransitions = await context.TransitionHistory.CountAsync();
-            var casesInProgress = await context.LodCases.CountAsync(c => c.CurrentState != "End");
+            var totalInformalCases = await context.LodCases.CountAsync();
+            var totalInformalTransitions = await context.TransitionHistory.CountAsync();
+            var informalCasesInProgress = await context.LodCases.CountAsync(c => c.CurrentState != "End");
 
-            Console.WriteLine($"  Total Cases: {totalCases}");
-            Console.WriteLine($"  Total Transitions: {totalTransitions}");
-            Console.WriteLine($"  Cases In Progress: {casesInProgress}");
-            Console.WriteLine($"  Cases Completed: {totalCases - casesInProgress}\n");
+            var totalFormalCases = await context.FormalLodCases.CountAsync();
+            var totalFormalTransitions = await context.FormalTransitionHistory.CountAsync();
+            var formalCasesInProgress = await context.FormalLodCases.CountAsync(c => c.CurrentState != "End");
+
+            Console.WriteLine("  Informal LOD Cases:");
+            Console.WriteLine($"    Total Cases: {totalInformalCases}");
+            Console.WriteLine($"    Total Transitions: {totalInformalTransitions}");
+            Console.WriteLine($"    Cases In Progress: {informalCasesInProgress}");
+            Console.WriteLine($"    Cases Completed: {totalInformalCases - informalCasesInProgress}\n");
+
+            Console.WriteLine("  Formal LOD Cases:");
+            Console.WriteLine($"    Total Cases: {totalFormalCases}");
+            Console.WriteLine($"    Total Transitions: {totalFormalTransitions}");
+            Console.WriteLine($"    Cases In Progress: {formalCasesInProgress}");
+            Console.WriteLine($"    Cases Completed: {totalFormalCases - formalCasesInProgress}\n");
+
+            Console.WriteLine($"  Grand Total Cases: {totalInformalCases + totalFormalCases}");
+            Console.WriteLine($"  Grand Total Transitions: {totalInformalTransitions + totalFormalTransitions}\n");
         }
     }
 }

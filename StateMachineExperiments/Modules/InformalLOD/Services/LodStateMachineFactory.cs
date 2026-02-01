@@ -17,82 +17,89 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
     {
         StateMachine<LodState, LodTrigger> CreateStateMachine(
             InformalLineOfDuty lodCase, 
-            IEventPublisher? eventPublisher = null);
+            INotificationService? notificationService = null);
     }
 
     public class LodStateMachineFactory : ILodStateMachineFactory
     {
+        private readonly INotificationService _notificationService;
+
+        public LodStateMachineFactory(INotificationService notificationService)
+        {
+            _notificationService = notificationService;
+        }
+
         public StateMachine<LodState, LodTrigger> CreateStateMachine(
             InformalLineOfDuty lodCase, 
-            IEventPublisher? eventPublisher = null)
+            INotificationService? notificationService = null)
         {
+            // Use injected service if not provided as parameter
+            var notificationSvc = notificationService ?? _notificationService;
             var currentState = Enum.Parse<LodState>(lodCase.CurrentState);
             var stateMachine = new StateMachine<LodState, LodTrigger>(currentState);
 
             // Configure Start state
             stateMachine.Configure(LodState.Start)
                 .Permit(LodTrigger.ProcessInitiated, LodState.MemberReports)
-                .OnExit(() => OnStateExit(LodState.Start, lodCase, eventPublisher));
+                .OnExit(() => OnStateExit(LodState.Start, lodCase, notificationSvc));
 
             // Configure MemberReports state
             stateMachine.Configure(LodState.MemberReports)
-                .OnEntry(() => OnStateEntry(LodState.MemberReports, lodCase, eventPublisher))
+                .OnEntry(() => OnStateEntry(LodState.MemberReports, lodCase, notificationSvc))
                 .Permit(LodTrigger.ConditionReported, LodState.LodInitiation)
-                .OnExit(() => OnStateExit(LodState.MemberReports, lodCase, eventPublisher));
+                .OnExit(() => OnStateExit(LodState.MemberReports, lodCase, notificationSvc));
 
             // Configure LodInitiation state
             stateMachine.Configure(LodState.LodInitiation)
-                .OnEntry(() => OnStateEntry(LodState.LodInitiation, lodCase, eventPublisher))
+                .OnEntry(() => OnStateEntry(LodState.LodInitiation, lodCase, notificationSvc))
                 .Permit(LodTrigger.InitiationComplete, LodState.MedicalAssessment)
-                .OnExit(() => OnStateExit(LodState.LodInitiation, lodCase, eventPublisher));
+                .OnExit(() => OnStateExit(LodState.LodInitiation, lodCase, notificationSvc));
 
             // Configure MedicalAssessment state
             stateMachine.Configure(LodState.MedicalAssessment)
-                .OnEntry(() => OnStateEntry(LodState.MedicalAssessment, lodCase, eventPublisher))
+                .OnEntry(() => OnStateEntry(LodState.MedicalAssessment, lodCase, notificationSvc))
                 .Permit(LodTrigger.AssessmentDone, LodState.CommanderReview)
-                .OnExit(() => OnStateExit(LodState.MedicalAssessment, lodCase, eventPublisher));
+                .OnExit(() => OnStateExit(LodState.MedicalAssessment, lodCase, notificationSvc));
 
             // Configure CommanderReview state - dynamic routing based on case requirements
             stateMachine.Configure(LodState.CommanderReview)
-                .OnEntry(() => OnStateEntry(LodState.CommanderReview, lodCase, eventPublisher))
+                .OnEntry(() => OnStateEntry(LodState.CommanderReview, lodCase, notificationSvc))
                 .PermitIf(LodTrigger.ReviewFinished, LodState.OptionalLegal, () => lodCase.RequiresLegalReview)
                 .Permit(LodTrigger.SkipToAdjudication, LodState.BoardAdjudication)
-                .OnExit(() => OnStateExit(LodState.CommanderReview, lodCase, eventPublisher));
+                .OnExit(() => OnStateExit(LodState.CommanderReview, lodCase, notificationSvc));
 
             // Configure OptionalLegal state
             stateMachine.Configure(LodState.OptionalLegal)
-                .OnEntry(() => OnStateEntry(LodState.OptionalLegal, lodCase, eventPublisher))
+                .OnEntry(() => OnStateEntry(LodState.OptionalLegal, lodCase, notificationSvc))
                 .PermitIf(LodTrigger.LegalDone, LodState.OptionalWing, () => lodCase.RequiresWingReview)
                 .Permit(LodTrigger.SkipWingReview, LodState.BoardAdjudication)
-                .OnExit(() => OnStateExit(LodState.OptionalLegal, lodCase, eventPublisher));
+                .OnExit(() => OnStateExit(LodState.OptionalLegal, lodCase, notificationSvc));
 
             // Configure OptionalWing state
             stateMachine.Configure(LodState.OptionalWing)
-                .OnEntry(() => OnStateEntry(LodState.OptionalWing, lodCase, eventPublisher))
+                .OnEntry(() => OnStateEntry(LodState.OptionalWing, lodCase, notificationSvc))
                 .Permit(LodTrigger.WingDone, LodState.BoardAdjudication)
-                .OnExit(() => OnStateExit(LodState.OptionalWing, lodCase, eventPublisher));
+                .OnExit(() => OnStateExit(LodState.OptionalWing, lodCase, notificationSvc));
 
             // Configure BoardAdjudication state
             stateMachine.Configure(LodState.BoardAdjudication)
-                .OnEntry(() => OnStateEntry(LodState.BoardAdjudication, lodCase, eventPublisher))
+                .OnEntry(() => OnStateEntry(LodState.BoardAdjudication, lodCase, notificationSvc))
                 .Permit(LodTrigger.AdjudicationComplete, LodState.Determination)
-                .OnExit(() => OnStateExit(LodState.BoardAdjudication, lodCase, eventPublisher));
+                .OnExit(() => OnStateExit(LodState.BoardAdjudication, lodCase, notificationSvc));
 
             // Configure Determination state
             stateMachine.Configure(LodState.Determination)
-                .OnEntry(() => OnStateEntry(LodState.Determination, lodCase, eventPublisher))
+                .OnEntry(() => OnStateEntry(LodState.Determination, lodCase, notificationSvc))
                 .Permit(LodTrigger.DeterminationFinalized, LodState.Notification)
                 .OnExit(() =>
                 {
-                    // Publish determination finalized event
-                    eventPublisher?.Publish(new LodDeterminationFinalizedEvent
-                    {
-                        CaseId = lodCase.Id,
-                        CaseNumber = lodCase.CaseNumber,
-                        Determination = "In Line of Duty",
-                        ApprovingAuthority = "HQ AFRC/A1"
-                    });
-                    OnStateExit(LodState.Determination, lodCase, eventPublisher);
+                    // Notify stakeholders of finalized determination
+                    notificationSvc.SendStakeholderAlert(
+                        caseNumber: lodCase.CaseNumber,
+                        alertType: "Determination Finalized",
+                        message: $"LOD determination finalized for case {lodCase.CaseNumber}: In Line of Duty",
+                        stakeholders: new[] { "HQ AFRC/A1", "LOD Manager" });
+                    OnStateExit(LodState.Determination, lodCase, notificationSvc);
                 });
 
             // Configure Notification state
@@ -100,49 +107,54 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
                 .OnEntry(() =>
                 {
                     // Auto-send notification when entering this state
-                    SendNotification(lodCase);
-                    OnStateEntry(LodState.Notification, lodCase, eventPublisher);
+                    SendNotification(lodCase, notificationSvc);
+                    OnStateEntry(LodState.Notification, lodCase, notificationSvc);
                 })
                 .Permit(LodTrigger.AppealFiled, LodState.Appeal)
                 .Permit(LodTrigger.NotificationComplete, LodState.End)
-                .OnExit(() => OnStateExit(LodState.Notification, lodCase, eventPublisher));
+                .OnExit(() => OnStateExit(LodState.Notification, lodCase, notificationSvc));
 
             // Configure Appeal state
             stateMachine.Configure(LodState.Appeal)
                 .OnEntry(() =>
                 {
-                    eventPublisher?.Publish(new LodAppealFiledEvent
-                    {
-                        CaseId = lodCase.Id,
-                        CaseNumber = lodCase.CaseNumber,
-                        AppealDate = DateTime.UtcNow,
-                        MemberId = lodCase.MemberId
-                    });
-                    OnStateEntry(LodState.Appeal, lodCase, eventPublisher);
+                    notificationSvc.SendNotification(
+                        recipient: lodCase.MemberName ?? "Member",
+                        subject: $"Appeal Filed - Case {lodCase.CaseNumber}",
+                        message: $"An appeal has been filed for LOD case {lodCase.CaseNumber} on {DateTime.UtcNow:yyyy-MM-dd}. " +
+                                $"The appeal will be reviewed by HQ AFRC/CD.",
+                        notificationType: "Email");
+                    OnStateEntry(LodState.Appeal, lodCase, notificationSvc);
                 })
                 .Permit(LodTrigger.AppealResolved, LodState.End)
-                .OnExit(() => OnStateExit(LodState.Appeal, lodCase, eventPublisher));
+                .OnExit(() => OnStateExit(LodState.Appeal, lodCase, notificationSvc));
 
             // Configure End state
             stateMachine.Configure(LodState.End)
-                .OnEntry(() => OnStateEntry(LodState.End, lodCase, eventPublisher));
+                .OnEntry(() => OnStateEntry(LodState.End, lodCase, notificationSvc));
 
             return stateMachine;
         }
 
-        private static void OnStateEntry(LodState state, InformalLineOfDuty lodCase, IEventPublisher? eventPublisher)
+        private static void OnStateEntry(LodState state, InformalLineOfDuty lodCase, INotificationService notificationService)
         {
             Console.WriteLine($"[ENTRY] Entering state: {state} for case {lodCase.CaseNumber}");
         }
 
-        private static void OnStateExit(LodState state, InformalLineOfDuty lodCase, IEventPublisher? eventPublisher)
+        private static void OnStateExit(LodState state, InformalLineOfDuty lodCase, INotificationService notificationService)
         {
             Console.WriteLine($"[EXIT] Exiting state: {state} for case {lodCase.CaseNumber}");
         }
 
-        private static void SendNotification(InformalLineOfDuty lodCase)
+        private static void SendNotification(InformalLineOfDuty lodCase, INotificationService notificationService)
         {
-            Console.WriteLine($"[NOTIFICATION] Sending email to member {lodCase.MemberName} ({lodCase.MemberId}) for case {lodCase.CaseNumber}");
+            notificationService.SendDeterminationNotification(
+                caseNumber: lodCase.CaseNumber,
+                memberId: lodCase.MemberId ?? "Unknown",
+                memberName: lodCase.MemberName ?? "Unknown",
+                determination: "In Line of Duty",
+                appealWindowDays: 30,
+                notificationType: "Email");
         }
     }
 }
