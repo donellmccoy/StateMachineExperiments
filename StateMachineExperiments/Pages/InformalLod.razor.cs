@@ -2,9 +2,10 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using Radzen;
 using Radzen.Blazor;
-using StateMachineExperiments.Common.Exceptions;
+using StateMachineExperiments.Exceptions;
+using StateMachineExperiments.Infrastructure;
+using StateMachineExperiments.Enums;
 using StateMachineExperiments.Modules.InformalLOD.Models;
-using StateMachineExperiments.Modules.InformalLOD.Services;
 using StateMachineExperiments.Models;
 using System;
 using System.Collections.Generic;
@@ -15,17 +16,20 @@ namespace StateMachineExperiments.Pages
 {
     public partial class InformalLod : ComponentBase
     {
+        // TODO: Update to use unified services - ILineOfDutyStateMachineService and ILineOfDutyDataService
+        /*
         [Inject]
         public required ILodStateMachineService LodService { get; set; }
 
         [Inject]
         public required IInformalLineOfDutyDataService DataService { get; set; }
+        */
 
         [Inject]
         public required ILogger<InformalLod> Logger { get; set; }
 
         [Inject]
-        public required NotificationService NotificationService { get; set; }
+        public required Radzen.NotificationService NotificationService { get; set; }
 
         [Inject]
         public required DialogService DialogService { get; set; }
@@ -34,7 +38,7 @@ namespace StateMachineExperiments.Pages
         private InformalLineOfDuty? selectedCase;
         private IList<InformalLineOfDuty>? selectedCases;
         private List<InformalLineOfDuty> allCases = new();
-        private List<StateTransitionHistory> caseHistory = new();
+        private List<InformalLodStateTransitionHistory> caseHistory = new();
         private List<string> permittedTriggers = new();
         private bool isLoading = true;
 

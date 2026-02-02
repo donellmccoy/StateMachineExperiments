@@ -239,27 +239,27 @@
                                 <RadzenCard class="rz-mt-3">
                                     @if (caseHistory.Any())
                                     {
-                                        <RadzenDataGrid Data="@caseHistory.OrderByDescending(t => t.Timestamp)" TItem="FormalStateTransitionHistory" 
+                                        <RadzenDataGrid Data="@caseHistory.OrderByDescending(t => t.Timestamp)" TItem="FormalLodStateTransitionHistory" 
                                                        AllowSorting="true" AllowPaging="true" PageSize="10">
                                             <Columns>
-                                                <RadzenDataGridColumn TItem="FormalStateTransitionHistory" Property="FromState" Title="From State" Width="150px">
+                                                <RadzenDataGridColumn TItem="FormalLodStateTransitionHistory" Property="FromState" Title="From State" Width="150px">
                                                     <Template Context="transition">
                                                         <RadzenBadge BadgeStyle="BadgeStyle.Light" Text="@transition.FromState.ToString()" />
                                                     </Template>
                                                 </RadzenDataGridColumn>
-                                                <RadzenDataGridColumn TItem="FormalStateTransitionHistory" Property="ToState" Title="To State" Width="150px">
+                                                <RadzenDataGridColumn TItem="FormalLodStateTransitionHistory" Property="ToState" Title="To State" Width="150px">
                                                     <Template Context="transition">
                                                         <RadzenBadge BadgeStyle="@GetStateBadgeStyle(transition.ToState)" Text="@transition.ToState.ToString()" />
                                                     </Template>
                                                 </RadzenDataGridColumn>
-                                                <RadzenDataGridColumn TItem="FormalStateTransitionHistory" Property="Trigger" Title="Trigger" Width="150px">
+                                                <RadzenDataGridColumn TItem="FormalLodStateTransitionHistory" Property="Trigger" Title="Trigger" Width="150px">
                                                     <Template Context="transition">
                                                         <RadzenBadge BadgeStyle="BadgeStyle.Info" Text="@transition.Trigger.ToString()" />
                                                     </Template>
                                                 </RadzenDataGridColumn>
-                                                <RadzenDataGridColumn TItem="FormalStateTransitionHistory" Property="PerformedByAuthority" Title="Authority" Width="150px" />
-                                                <RadzenDataGridColumn TItem="FormalStateTransitionHistory" Property="Timestamp" Title="Timestamp" FormatString="{0:g}" />
-                                                <RadzenDataGridColumn TItem="FormalStateTransitionHistory" Property="Notes" Title="Notes" />
+                                                <RadzenDataGridColumn TItem="FormalLodStateTransitionHistory" Property="PerformedByAuthority" Title="Authority" Width="150px" />
+                                                <RadzenDataGridColumn TItem="FormalLodStateTransitionHistory" Property="Timestamp" Title="Timestamp" FormatString="{0:g}" />
+                                                <RadzenDataGridColumn TItem="FormalLodStateTransitionHistory" Property="Notes" Title="Notes" />
                                             </Columns>
                                         </RadzenDataGrid>
                                     }

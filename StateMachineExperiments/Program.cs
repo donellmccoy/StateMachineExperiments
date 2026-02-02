@@ -3,10 +3,11 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using StateMachineExperiments;
-using StateMachineExperiments.Common.Data;
-using StateMachineExperiments.Common.Infrastructure;
-using StateMachineExperiments.Modules.InformalLOD.Services;
-using StateMachineExperiments.Modules.FormalLOD.Services;
+using StateMachineExperiments.Data;
+using StateMachineExperiments.Enums;
+using StateMachineExperiments.Factories;
+using StateMachineExperiments.Infrastructure;
+using StateMachineExperiments.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -38,19 +39,13 @@ builder.Services.AddScoped<Radzen.ContextMenuService>();
 builder.Services.AddScoped<ISmtpService, SmtpService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 
-// Register Informal LOD services
-builder.Services.AddScoped<IInformalLineOfDutyDataService, InformalLineOfDutyService>();
-builder.Services.AddScoped<ILodBusinessRuleService, LodBusinessRuleService>();
+// Register unified state machine factory for both Informal and Formal LOD
 builder.Services.AddScoped<ILodStateMachineFactory, LodStateMachineFactory>();
-builder.Services.AddScoped<ILodTransitionValidator, LodTransitionValidator>();
-builder.Services.AddScoped<ILodStateMachineService, LodStateMachineService>();
-builder.Services.AddScoped<ILodVisualizationService, LodVisualizationService>();
 
-// Register Formal LOD services
-builder.Services.AddScoped<IFormalLodDataService, FormalLodDataService>();
-builder.Services.AddScoped<IFormalLodBusinessRuleService, FormalLodBusinessRuleService>();
-builder.Services.AddScoped<IFormalLodStateMachineFactory, FormalLodStateMachineFactory>();
-builder.Services.AddScoped<IFormalLodTransitionValidator, FormalLodTransitionValidator>();
-builder.Services.AddScoped<IFormalLodStateMachineService, FormalLodStateMachineService>();
+// Register unified LOD services
+builder.Services.AddScoped<ILineOfDutyDataService, LineOfDutyDataService>();
+builder.Services.AddScoped<ILineOfDutyBusinessRuleService, LineOfDutyBusinessRuleService>();
+builder.Services.AddScoped<ILineOfDutyTransitionValidator, LineOfDutyTransitionValidator>();
+builder.Services.AddScoped<ILineOfDutyStateMachineService, LineOfDutyStateMachineService>();
 
 await builder.Build().RunAsync();

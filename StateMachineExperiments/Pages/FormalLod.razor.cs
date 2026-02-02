@@ -2,9 +2,10 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using Radzen;
 using Radzen.Blazor;
-using StateMachineExperiments.Common.Exceptions;
+using StateMachineExperiments.Exceptions;
+using StateMachineExperiments.Infrastructure;
+using StateMachineExperiments.Enums;
 using StateMachineExperiments.Modules.FormalLOD.Models;
-using StateMachineExperiments.Modules.FormalLOD.Services;
 using StateMachineExperiments.Models;
 using System;
 using System.Collections.Generic;
@@ -15,17 +16,20 @@ namespace StateMachineExperiments.Pages
 {
     public partial class FormalLod : ComponentBase
     {
+        // TODO: Update to use unified services - ILineOfDutyStateMachineService and ILineOfDutyDataService
+        /*
         [Inject]
-        public required IFormalLodStateMachineService FormalLodService { get; set; }
+        public required ILodStateMachineService FormalLodService { get; set; }
 
         [Inject]
         public required IFormalLodDataService DataService { get; set; }
+        */
 
         [Inject]
         public required ILogger<FormalLod> Logger { get; set; }
 
         [Inject]
-        public required NotificationService NotificationService { get; set; }
+        public required Radzen.NotificationService NotificationService { get; set; }
 
         [Inject]
         public required DialogService DialogService { get; set; }
@@ -34,7 +38,7 @@ namespace StateMachineExperiments.Pages
         private FormalLineOfDuty? selectedCase;
         private IList<FormalLineOfDuty>? selectedCases;
         private List<FormalLineOfDuty> allCases = new();
-        private List<FormalStateTransitionHistory> caseHistory = new();
+        private List<FormalLodStateTransitionHistory> caseHistory = new();
         private List<string> permittedTriggers = new();
         private bool isLoading = true;
 
@@ -132,7 +136,7 @@ namespace StateMachineExperiments.Pages
 
             try
             {
-                if (Enum.TryParse<FormalLodTrigger>(triggerName, out var trigger))
+                if (Enum.TryParse<LodTrigger>(triggerName, out var trigger))
                 {
                     await FormalLodService.FireTriggerAsync(selectedCase.Id, trigger);
                     ShowNotification("Success", $"Trigger '{triggerName}' executed successfully!", NotificationSeverity.Success);
@@ -164,22 +168,22 @@ namespace StateMachineExperiments.Pages
             }
         }
 
-        private BadgeStyle GetStateBadgeStyle(FormalLodState state)
+        private BadgeStyle GetStateBadgeStyle(LodState state)
         {
             return state switch
             {
-                FormalLodState.Start => BadgeStyle.Secondary,
-                FormalLodState.MemberReports => BadgeStyle.Info,
-                FormalLodState.FormalInitiation => BadgeStyle.Info,
-                FormalLodState.AppointingOfficer => BadgeStyle.Primary,
-                FormalLodState.Investigation => BadgeStyle.Primary,
-                FormalLodState.WingLegalReview => BadgeStyle.Warning,
-                FormalLodState.WingCommanderReview => BadgeStyle.Warning,
-                FormalLodState.BoardAdjudication => BadgeStyle.Primary,
-                FormalLodState.Determination => BadgeStyle.Info,
-                FormalLodState.Notification => BadgeStyle.Info,
-                FormalLodState.Appeal => BadgeStyle.Danger,
-                FormalLodState.End => BadgeStyle.Success,
+                LodState.Start => BadgeStyle.Secondary,
+                LodState.MemberReports => BadgeStyle.Info,
+                LodState.FormalInitiation => BadgeStyle.Info,
+                LodState.AppointingOfficer => BadgeStyle.Primary,
+                LodState.Investigation => BadgeStyle.Primary,
+                LodState.WingLegalReview => BadgeStyle.Warning,
+                LodState.WingCommanderReview => BadgeStyle.Warning,
+                LodState.BoardAdjudication => BadgeStyle.Primary,
+                LodState.Determination => BadgeStyle.Info,
+                LodState.Notification => BadgeStyle.Info,
+                LodState.Appeal => BadgeStyle.Danger,
+                LodState.End => BadgeStyle.Success,
                 _ => BadgeStyle.Light
             };
         }
