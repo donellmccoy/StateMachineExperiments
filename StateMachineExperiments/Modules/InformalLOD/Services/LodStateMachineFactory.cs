@@ -95,7 +95,7 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
             return stateMachine;
         }
 
-        private async Task OnStateEntryAsync(LodState state, InformalLineOfDuty lodCase)
+        private static async Task OnStateEntryAsync(LodState state, InformalLineOfDuty lodCase)
         {
             Console.WriteLine($"[ENTRY] Entering state: {state} for case {lodCase.CaseNumber}");
 
@@ -111,6 +111,7 @@ namespace StateMachineExperiments.Modules.InformalLOD.Services
                 case LodState.Appeal:
                     break;
             }
+            
             await Task.CompletedTask;
         }
 
