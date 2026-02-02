@@ -1,4 +1,5 @@
 @page "/informal-lod"
+@using StateMachineExperiments.Models
 
 <PageTitle>Informal LOD Cases</PageTitle>
 
@@ -30,28 +31,39 @@
                     <RadzenIcon Icon="add_circle_outline" /> Create New Case
                 </RadzenText>
                 
-                <RadzenRow Gap="1rem">
-                    <RadzenColumn Size="12" SizeMD="4">
-                        <RadzenFormField Text="Case Number" Variant="Variant.Outlined">
-                            <RadzenTextBox @bind-Value="newCaseNumber" Placeholder="e.g., LOD-2026-001" Style="width: 100%;" />
-                        </RadzenFormField>
-                    </RadzenColumn>
-                    <RadzenColumn Size="12" SizeMD="4">
-                        <RadzenFormField Text="Member ID" Variant="Variant.Outlined">
-                            <RadzenTextBox @bind-Value="newMemberId" Placeholder="Enter member ID" Style="width: 100%;" />
-                        </RadzenFormField>
-                    </RadzenColumn>
-                    <RadzenColumn Size="12" SizeMD="4">
-                        <RadzenFormField Text="Member Name" Variant="Variant.Outlined">
-                            <RadzenTextBox @bind-Value="newMemberName" Placeholder="Enter member name" Style="width: 100%;" />
-                        </RadzenFormField>
-                    </RadzenColumn>
-                </RadzenRow>
-                
-                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
-                    <RadzenButton Icon="add" Text="Create Case" ButtonStyle="ButtonStyle.Success" Click="CreateNewCase" />
-                    <RadzenButton Icon="refresh" Text="Refresh List" ButtonStyle="ButtonStyle.Light" Click="LoadAllCases" />
-                </RadzenStack>
+                <RadzenTemplateForm Data="@newCaseModel" Submit="@((NewInformalCaseFormModel model) => CreateNewCase(model))">
+                    <RadzenRow Gap="1rem">
+                        <RadzenColumn Size="12" SizeMD="4">
+                            <RadzenFormField Text="Case Number" Variant="Variant.Outlined">
+                                <RadzenTextBox @bind-Value="newCaseModel.CaseNumber" Name="CaseNumber" 
+                                              Placeholder="e.g., LOD-2026-001" Style="width: 300px;" />
+                            </RadzenFormField>
+                            <RadzenRequiredValidator Component="CaseNumber" Text="Case number is required" />
+                            <RadzenLengthValidator Component="CaseNumber" Max="50" Text="Case number cannot exceed 50 characters" />
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="4">
+                            <RadzenFormField Text="Member ID" Variant="Variant.Outlined">
+                                <RadzenTextBox @bind-Value="newCaseModel.MemberId" Name="MemberId" 
+                                              Placeholder="Enter member ID" Style="width: 300px;" />
+                            </RadzenFormField>
+                            <RadzenRequiredValidator Component="MemberId" Text="Member ID is required" />
+                            <RadzenLengthValidator Component="MemberId" Max="20" Text="Member ID cannot exceed 20 characters" />
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="4">
+                            <RadzenFormField Text="Member Name" Variant="Variant.Outlined">
+                                <RadzenTextBox @bind-Value="newCaseModel.MemberName" Name="MemberName" 
+                                              Placeholder="Enter member name" Style="width: 300px;" />
+                            </RadzenFormField>
+                            <RadzenRequiredValidator Component="MemberName" Text="Member name is required" />
+                            <RadzenLengthValidator Component="MemberName" Max="100" Text="Member name cannot exceed 100 characters" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                    
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                        <RadzenButton Icon="add" Text="Create Case" ButtonStyle="ButtonStyle.Success" ButtonType="ButtonType.Submit" />
+                        <RadzenButton Icon="refresh" Text="Refresh List" ButtonStyle="ButtonStyle.Light" Click="LoadAllCases" ButtonType="ButtonType.Button" />
+                    </RadzenStack>
+                </RadzenTemplateForm>
             </RadzenStack>
         </RadzenCard>
 

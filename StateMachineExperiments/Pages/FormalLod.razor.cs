@@ -5,6 +5,7 @@ using Radzen.Blazor;
 using StateMachineExperiments.Common.Exceptions;
 using StateMachineExperiments.Modules.FormalLOD.Models;
 using StateMachineExperiments.Modules.FormalLOD.Services;
+using StateMachineExperiments.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,10 +38,7 @@ namespace StateMachineExperiments.Pages
         private List<string> permittedTriggers = new();
         private bool isLoading = true;
 
-        private string newCaseNumber = string.Empty;
-        private string newMemberId = string.Empty;
-        private string newMemberName = string.Empty;
-        private bool isDeathCase = false;
+        private NewFormalCaseFormModel newCaseModel = new();
 
         protected override async Task OnInitializedAsync()
         {
@@ -62,30 +60,21 @@ namespace StateMachineExperiments.Pages
             }
         }
 
-        private async Task CreateNewCase()
+        private async Task CreateNewCase(NewFormalCaseFormModel model)
         {
-            if (string.IsNullOrWhiteSpace(newCaseNumber))
-            {
-                ShowNotification("Validation Error", "Please enter a case number.", NotificationSeverity.Warning);
-                return;
-            }
-
             try
             {
-                var newCase = await FormalLodService.CreateNewCaseAsync(newCaseNumber, newMemberId, newMemberName, isDeathCase);
+                var newCase = await FormalLodService.CreateNewCaseAsync(model.CaseNumber, model.MemberId, model.MemberName, model.IsDeathCase);
                 ShowNotification("Success", $"Formal case {newCase.CaseNumber} created successfully!", NotificationSeverity.Success);
                 
-                newCaseNumber = string.Empty;
-                newMemberId = string.Empty;
-                newMemberName = string.Empty;
-                isDeathCase = false;
+                newCaseModel = new NewFormalCaseFormModel();
                 
                 await LoadAllCases();
                 await SelectCase(newCase);
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error creating formal case {CaseNumber}", newCaseNumber);
+                Logger.LogError(ex, "Error creating formal case {CaseNumber}", model.CaseNumber);
                 ShowNotification("Error", $"Error creating case: {GetUserFriendlyErrorMessage(ex)}", NotificationSeverity.Error);
             }
         }
