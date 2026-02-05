@@ -40,7 +40,7 @@ builder.Services.AddScoped<ISmtpService, SmtpService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 
 // Register unified state machine factory for both Informal and Formal LOD
-builder.Services.AddScoped<ILodStateMachineFactory, LodStateMachineFactory>();
+builder.Services.AddScoped<ILineOfDutyStateMachineFactory, LineOfDutyStateMachineFactory>();
 
 // Register unified LOD services
 builder.Services.AddScoped<ILineOfDutyDataService, LineOfDutyDataService>();

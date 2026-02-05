@@ -10,7 +10,7 @@ namespace StateMachineExperiments.Factories
     /// Unified factory for creating state machines for both Informal and Formal Line of Duty cases.
     /// Uses the CaseType discriminator to determine which workflow to configure.
     /// </summary>
-    public class LodStateMachineFactory : ILodStateMachineFactory
+    public class LineOfDutyStateMachineFactory : ILineOfDutyStateMachineFactory
     {
         public StateMachine<LineOfDutyState, LineOfDutyTrigger> CreateStateMachine(LineOfDutyCase lodCase)
         {

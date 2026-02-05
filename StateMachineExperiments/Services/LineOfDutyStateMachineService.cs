@@ -17,7 +17,7 @@ namespace StateMachineExperiments.Services
         private readonly ILineOfDutyDataService _dataService;
         private readonly ILineOfDutyBusinessRuleService _businessRules;
         private readonly ILineOfDutyTransitionValidator _validator;
-        private readonly ILodStateMachineFactory _stateMachineFactory;
+        private readonly ILineOfDutyStateMachineFactory _stateMachineFactory;
         private readonly INotificationService _notificationService;
         private readonly ILogger<LineOfDutyStateMachineService> _logger;
         private readonly Dictionary<LineOfDutyState, LineOfDutyAuthority> _stateToAuthorityMap;
@@ -26,7 +26,7 @@ namespace StateMachineExperiments.Services
             ILineOfDutyDataService dataService,
             ILineOfDutyBusinessRuleService businessRules,
             ILineOfDutyTransitionValidator validator,
-            ILodStateMachineFactory stateMachineFactory,
+            ILineOfDutyStateMachineFactory stateMachineFactory,
             INotificationService notificationService,
             ILogger<LineOfDutyStateMachineService> logger)
         {
