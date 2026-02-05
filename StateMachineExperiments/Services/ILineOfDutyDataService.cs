@@ -11,11 +11,11 @@ namespace StateMachineExperiments.Services
     /// </summary>
     public interface ILineOfDutyDataService
     {
-        Task<LineOfDutyCase> CreateNewCaseAsync(LineOfDutyType caseType, string caseNumber, int memberId, bool isDeathCase = false);
+        Task<LineOfDutyCase> CreateNewCaseAsync(LineOfDutyCaseType caseType, string caseNumber, int memberId, bool isDeathCase = false);
         Task<LineOfDutyCase?> GetCaseAsync(int caseId);
         Task<LineOfDutyCase?> GetCaseByCaseNumberAsync(string caseNumber);
         Task<IEnumerable<LineOfDutyCase>> GetAllCasesAsync();
-        Task<IEnumerable<LineOfDutyCase>> GetCasesByTypeAsync(LineOfDutyType caseType);
+        Task<IEnumerable<LineOfDutyCase>> GetCasesByTypeAsync(LineOfDutyCaseType caseType);
         Task UpdateCaseAsync(LineOfDutyCase lodCase);
         Task AddTransitionHistoryAsync(LineOfDutyStateTransitionHistory history);
         Task<List<LineOfDutyStateTransitionHistory>> GetTransitionHistoryAsync(int caseId);

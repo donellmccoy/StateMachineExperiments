@@ -11,14 +11,14 @@ namespace StateMachineExperiments.Services
 {
     public class LineOfDutyDataService : ILineOfDutyDataService
     {
-        private readonly IDbContextFactory<CaseManagementDbContext> _contextFactory;
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
 
-        public LineOfDutyDataService(IDbContextFactory<CaseManagementDbContext> contextFactory)
+        public LineOfDutyDataService(IDbContextFactory<ApplicationDbContext> contextFactory)
         {
             _contextFactory = contextFactory;
         }
 
-        public async Task<LineOfDutyCase> CreateNewCaseAsync(LineOfDutyType caseType, string caseNumber, int memberId, bool isDeathCase = false)
+        public async Task<LineOfDutyCase> CreateNewCaseAsync(LineOfDutyCaseType caseType, string caseNumber, int memberId, bool isDeathCase = false)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(caseNumber);
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(memberId);
@@ -77,7 +77,7 @@ namespace StateMachineExperiments.Services
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<LineOfDutyCase>> GetCasesByTypeAsync(LineOfDutyType caseType)
+        public async Task<IEnumerable<LineOfDutyCase>> GetCasesByTypeAsync(LineOfDutyCaseType caseType)
         {
             await using var context = await _contextFactory.CreateDbContextAsync();
             

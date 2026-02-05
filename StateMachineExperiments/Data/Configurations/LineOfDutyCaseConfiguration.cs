@@ -18,8 +18,8 @@ namespace StateMachineExperiments.Data.Configurations
             
             // Configure discriminator column
             builder.HasDiscriminator(e => e.LineOfDutyType)
-                .HasValue<LineOfDutyCase>(LineOfDutyType.Informal)
-                .HasValue<LineOfDutyCase>(LineOfDutyType.Formal);
+                .HasValue<LineOfDutyCase>(LineOfDutyCaseType.Informal)
+                .HasValue<LineOfDutyCase>(LineOfDutyCaseType.Formal);
             
             // Common properties
             builder.Property(e => e.CaseNumber)

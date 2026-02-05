@@ -17,7 +17,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
 
 // Configure DbContext factory with in-memory database (SQLite doesn't work in browser)
-builder.Services.AddDbContextFactory<CaseManagementDbContext>(options =>
+builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     options.UseInMemoryDatabase("LodCasesDb"));
 
 // Bind configuration settings

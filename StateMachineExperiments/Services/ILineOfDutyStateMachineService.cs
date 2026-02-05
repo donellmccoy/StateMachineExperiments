@@ -19,7 +19,7 @@ namespace StateMachineExperiments.Services
         /// <param name="memberId">The member ID (foreign key to Member entity).</param>
         /// <param name="isDeathCase">Whether this is a death case (Formal cases only).</param>
         /// <returns>The newly created LOD case.</returns>
-        Task<LineOfDutyCase> CreateNewCaseAsync(LineOfDutyType caseType, string caseNumber, int memberId, bool isDeathCase = false);
+        Task<LineOfDutyCase> CreateNewCaseAsync(LineOfDutyCaseType caseType, string caseNumber, int memberId, bool isDeathCase = false);
         
         /// <summary>
         /// Retrieves a case by its database ID.
@@ -86,6 +86,6 @@ namespace StateMachineExperiments.Services
         /// </summary>
         /// <param name="state">The LOD state.</param>
         /// <returns>The responsible authority.</returns>
-        LodAuthority GetCurrentAuthority(LineOfDutyState state);
+        LineOfDutyAuthority GetCurrentAuthority(LineOfDutyState state);
     }
 }

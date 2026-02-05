@@ -20,7 +20,7 @@ namespace StateMachineExperiments.Services
         private readonly ILodStateMachineFactory _stateMachineFactory;
         private readonly INotificationService _notificationService;
         private readonly ILogger<LineOfDutyStateMachineService> _logger;
-        private readonly Dictionary<LineOfDutyState, LodAuthority> _stateToAuthorityMap;
+        private readonly Dictionary<LineOfDutyState, LineOfDutyAuthority> _stateToAuthorityMap;
 
         public LineOfDutyStateMachineService(
             ILineOfDutyDataService dataService,
@@ -37,34 +37,34 @@ namespace StateMachineExperiments.Services
             _notificationService = notificationService;
             _logger = logger;
 
-            _stateToAuthorityMap = new Dictionary<LineOfDutyState, LodAuthority>
+            _stateToAuthorityMap = new Dictionary<LineOfDutyState, LineOfDutyAuthority>
             {
                 // Common states
-                { LineOfDutyState.Start, LodAuthority.None },
-                { LineOfDutyState.MemberReports, LodAuthority.Member },
-                { LineOfDutyState.BoardAdjudication, LodAuthority.ReviewingBoard },
-                { LineOfDutyState.Determination, LodAuthority.ApprovingAuthority },
-                { LineOfDutyState.Notification, LodAuthority.LodPm },
-                { LineOfDutyState.Appeal, LodAuthority.AppellateAuthority },
-                { LineOfDutyState.End, LodAuthority.None },
+                { LineOfDutyState.Start, LineOfDutyAuthority.None },
+                { LineOfDutyState.MemberReports, LineOfDutyAuthority.Member },
+                { LineOfDutyState.BoardAdjudication, LineOfDutyAuthority.ReviewingBoard },
+                { LineOfDutyState.Determination, LineOfDutyAuthority.ApprovingAuthority },
+                { LineOfDutyState.Notification, LineOfDutyAuthority.LodPm },
+                { LineOfDutyState.Appeal, LineOfDutyAuthority.AppellateAuthority },
+                { LineOfDutyState.End, LineOfDutyAuthority.None },
                 
                 // Informal-specific states
-                { LineOfDutyState.LodInitiation, LodAuthority.LodMfp },
-                { LineOfDutyState.MedicalAssessment, LodAuthority.MedicalProvider },
-                { LineOfDutyState.CommanderReview, LodAuthority.ImmediateCommander },
-                { LineOfDutyState.OptionalLegal, LodAuthority.LegalAdvisor },
-                { LineOfDutyState.OptionalWing, LodAuthority.WingCommander },
+                { LineOfDutyState.LodInitiation, LineOfDutyAuthority.LodMfp },
+                { LineOfDutyState.MedicalAssessment, LineOfDutyAuthority.MedicalProvider },
+                { LineOfDutyState.CommanderReview, LineOfDutyAuthority.ImmediateCommander },
+                { LineOfDutyState.OptionalLegal, LineOfDutyAuthority.LegalAdvisor },
+                { LineOfDutyState.OptionalWing, LineOfDutyAuthority.WingCommander },
                 
                 // Formal-specific states
-                { LineOfDutyState.FormalInitiation, LodAuthority.LodMfp },
-                { LineOfDutyState.AppointingOfficer, LodAuthority.AppointingAuthority },
-                { LineOfDutyState.Investigation, LodAuthority.InvestigatingOfficer },
-                { LineOfDutyState.WingLegalReview, LodAuthority.LegalAdvisor },
-                { LineOfDutyState.WingCommanderReview, LodAuthority.WingCommander }
+                { LineOfDutyState.FormalInitiation, LineOfDutyAuthority.LodMfp },
+                { LineOfDutyState.AppointingOfficer, LineOfDutyAuthority.AppointingAuthority },
+                { LineOfDutyState.Investigation, LineOfDutyAuthority.InvestigatingOfficer },
+                { LineOfDutyState.WingLegalReview, LineOfDutyAuthority.LegalAdvisor },
+                { LineOfDutyState.WingCommanderReview, LineOfDutyAuthority.WingCommander }
             };
         }
 
-        public async Task<LineOfDutyCase> CreateNewCaseAsync(LineOfDutyType caseType, string caseNumber, int memberId, bool isDeathCase = false)
+        public async Task<LineOfDutyCase> CreateNewCaseAsync(LineOfDutyCaseType caseType, string caseNumber, int memberId, bool isDeathCase = false)
         {
             _logger.LogInformation("Creating new {CaseType} LOD case: {CaseNumber} for member ID {MemberId}", 
                 caseType, caseNumber, memberId);
@@ -77,7 +77,7 @@ namespace StateMachineExperiments.Services
             var memberCardId = member?.CardId ?? "N/A";
 
             // Send notification to stakeholders for formal cases
-            if (caseType == LineOfDutyType.Formal)
+            if (caseType == LineOfDutyCaseType.Formal)
             {
                 await _notificationService.AlertStakeholdersAsync(new StakeholderAlertRequest
                 {
@@ -200,9 +200,9 @@ namespace StateMachineExperiments.Services
             return await _validator.ValidateTransitionAsync(lodCase, trigger);
         }
 
-        public LodAuthority GetCurrentAuthority(LineOfDutyState state)
+        public LineOfDutyAuthority GetCurrentAuthority(LineOfDutyState state)
         {
-            return _stateToAuthorityMap.GetValueOrDefault(state, LodAuthority.None);
+            return _stateToAuthorityMap.GetValueOrDefault(state, LineOfDutyAuthority.None);
         }
     }
 }

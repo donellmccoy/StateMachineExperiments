@@ -22,7 +22,7 @@ namespace StateMachineExperiments.Services
         /// </summary>
         public bool RequiresLegalReview(LineOfDutyCase lodCase)
         {
-            if (lodCase.LineOfDutyType != LineOfDutyType.Informal)
+            if (lodCase.LineOfDutyType != LineOfDutyCaseType.Informal)
                 return false;
 
             return (lodCase.InjurySeverity.HasValue && lodCase.InjurySeverity.Value > _settings.LegalReview.InjurySeverityThreshold) ||
@@ -34,7 +34,7 @@ namespace StateMachineExperiments.Services
         /// </summary>
         public bool RequiresWingReview(LineOfDutyCase lodCase)
         {
-            if (lodCase.LineOfDutyType != LineOfDutyType.Informal)
+            if (lodCase.LineOfDutyType != LineOfDutyCaseType.Informal)
                 return false;
 
             return (lodCase.InjurySeverity.HasValue && lodCase.InjurySeverity.Value > _settings.WingReview.InjurySeverityThreshold) ||
@@ -48,7 +48,7 @@ namespace StateMachineExperiments.Services
         /// </summary>
         public bool RequiresToxicology(LineOfDutyCase lodCase)
         {
-            if (lodCase.LineOfDutyType != LineOfDutyType.Formal)
+            if (lodCase.LineOfDutyType != LineOfDutyCaseType.Formal)
                 return false;
 
             // This would be determined by the investigating officer based on case specifics
@@ -61,7 +61,7 @@ namespace StateMachineExperiments.Services
         /// </summary>
         public bool CanProceedFromInvestigation(LineOfDutyCase lodCase)
         {
-            if (lodCase.LineOfDutyType != LineOfDutyType.Formal)
+            if (lodCase.LineOfDutyType != LineOfDutyCaseType.Formal)
                 return true;
 
             if (!lodCase.ToxicologyRequired)
@@ -94,7 +94,7 @@ namespace StateMachineExperiments.Services
             var daysSinceNotification = (appealDate - notificationTransition.Timestamp).TotalDays;
             
             int appealDeadlineDays;
-            if (lodCase.LineOfDutyType == LineOfDutyType.Informal)
+            if (lodCase.LineOfDutyType == LineOfDutyCaseType.Informal)
             {
                 appealDeadlineDays = _settings.Appeal.DeadlineDays;
             }
@@ -111,7 +111,7 @@ namespace StateMachineExperiments.Services
         /// </summary>
         public void ApplyBusinessRules(LineOfDutyCase lodCase)
         {
-            if (lodCase.LineOfDutyType == LineOfDutyType.Informal)
+            if (lodCase.LineOfDutyType == LineOfDutyCaseType.Informal)
             {
                 lodCase.RequiresLegalReview = RequiresLegalReview(lodCase);
                 lodCase.RequiresWingReview = RequiresWingReview(lodCase);

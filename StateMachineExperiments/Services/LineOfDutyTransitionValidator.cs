@@ -19,7 +19,7 @@ namespace StateMachineExperiments.Services
             var result = new ValidationResult { IsValid = true };
 
             // Case type-specific validation
-            if (lodCase.LineOfDutyType == LineOfDutyType.Formal)
+            if (lodCase.LineOfDutyType == LineOfDutyCaseType.Formal)
             {
                 return ValidateFormalTransition(lodCase, trigger);
             }

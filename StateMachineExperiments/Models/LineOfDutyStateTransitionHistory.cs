@@ -42,7 +42,7 @@ namespace StateMachineExperiments.Models
         /// <summary>
         /// Gets or sets the authority that performed this transition.
         /// </summary>
-        public LodAuthority PerformedByAuthority { get; set; }
+        public LineOfDutyAuthority PerformedByAuthority { get; set; }
         
         /// <summary>
         /// Gets or sets an optional description of the transition.

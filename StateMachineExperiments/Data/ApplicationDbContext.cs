@@ -4,7 +4,7 @@ using StateMachineExperiments.Models;
 
 namespace StateMachineExperiments.Data
 {
-    public class CaseManagementDbContext : DbContext
+    public class ApplicationDbContext : DbContext
     {
         public DbSet<LineOfDutyCase> LineOfDutyCases { get; set; } = null!;
 
@@ -30,7 +30,7 @@ namespace StateMachineExperiments.Data
         
         public DbSet<SpecialCase> SpecialCases { get; set; } = null!;
 
-        public CaseManagementDbContext(DbContextOptions<CaseManagementDbContext> options) : base(options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
 

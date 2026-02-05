@@ -19,7 +19,7 @@ namespace StateMachineExperiments.Models
         /// <summary>
         /// Gets or sets the discriminator indicating the type of LOD case (Informal or Formal).
         /// </summary>
-        public LineOfDutyType LineOfDutyType { get; set; } = LineOfDutyType.Informal;
+        public LineOfDutyCaseType LineOfDutyType { get; set; } = LineOfDutyCaseType.Informal;
         
         /// <summary>
         /// Gets or sets the unique case number (e.g., LOD-2026-001 or FORMAL-LOD-2026-001).

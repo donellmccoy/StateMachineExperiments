@@ -4,7 +4,7 @@ namespace StateMachineExperiments.Enums
     /// Represents the authority levels involved in LOD processing.
     /// Based on DAFI 36-2910 for AFRC LOD (both Informal and Formal).
     /// </summary>
-    public enum LodAuthority
+    public enum LineOfDutyAuthority
     {
         None,
         Member,                 // The reporting member

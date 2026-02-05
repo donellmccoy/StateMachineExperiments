@@ -14,7 +14,7 @@ namespace StateMachineExperiments.Factories
     {
         public StateMachine<LineOfDutyState, LineOfDutyTrigger> CreateStateMachine(LineOfDutyCase lodCase)
         {
-            return lodCase.LineOfDutyType == LineOfDutyType.Informal 
+            return lodCase.LineOfDutyType == LineOfDutyCaseType.Informal 
                 ? CreateInformalStateMachine(lodCase) 
                 : CreateFormalStateMachine(lodCase);
         }
