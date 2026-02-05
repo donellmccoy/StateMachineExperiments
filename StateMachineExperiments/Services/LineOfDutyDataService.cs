@@ -18,22 +18,24 @@ namespace StateMachineExperiments.Services
             _contextFactory = contextFactory;
         }
 
-        public async Task<LineOfDuty> CreateNewCaseAsync(LodType caseType, string caseNumber, string? memberId = null, string? memberName = null, bool isDeathCase = false)
+        public async Task<LineOfDutyCase> CreateNewCaseAsync(LineOfDutyType caseType, string caseNumber, int memberId, bool isDeathCase = false)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(caseNumber);
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(memberId);
 
             await using var context = await _contextFactory.CreateDbContextAsync();
             
-            var entity = context.LineOfDutyCases.Add(new LineOfDuty
+            var entity = context.LineOfDutyCases.Add(new LineOfDutyCase
             {
-                CaseType = caseType,
+                LineOfDutyType = caseType,
                 CaseNumber = caseNumber,
                 MemberId = memberId,
-                MemberName = memberName,
                 IsDeathCase = isDeathCase,
-                CurrentState = LodState.Start,
+                LineOfDutyState = LineOfDutyState.Start,
                 CreatedDate = DateTime.UtcNow,
-                LastModifiedDate = DateTime.UtcNow
+                LastModifiedDate = DateTime.UtcNow,
+                CreatedByUserId = 1, // TODO: Get from current user context
+                LastModifiedByUserId = 1 // TODO: Get from current user context
             });
 
             await context.SaveChangesAsync();
@@ -41,7 +43,7 @@ namespace StateMachineExperiments.Services
             return entity.Entity;
         }
 
-        public async Task<LineOfDuty?> GetCaseAsync(int caseId)
+        public async Task<LineOfDutyCase?> GetCaseAsync(int caseId)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(caseId);
             
@@ -49,10 +51,11 @@ namespace StateMachineExperiments.Services
             
             return await context.LineOfDutyCases
                 .Include(c => c.TransitionHistory)
+                .Include(c => c.Member)
                 .FirstOrDefaultAsync(c => c.Id == caseId);
         }
 
-        public async Task<LineOfDuty?> GetCaseByCaseNumberAsync(string caseNumber)
+        public async Task<LineOfDutyCase?> GetCaseByCaseNumberAsync(string caseNumber)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(caseNumber);
             
@@ -60,29 +63,32 @@ namespace StateMachineExperiments.Services
             
             return await context.LineOfDutyCases
                 .Include(c => c.TransitionHistory)
+                .Include(c => c.Member)
                 .FirstOrDefaultAsync(c => c.CaseNumber == caseNumber);
         }
 
-        public async Task<IEnumerable<LineOfDuty>> GetAllCasesAsync()
+        public async Task<IEnumerable<LineOfDutyCase>> GetAllCasesAsync()
         {
             await using var context = await _contextFactory.CreateDbContextAsync();
             
             return await context.LineOfDutyCases
                 .Include(c => c.TransitionHistory)
+                .Include(c => c.Member)
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<LineOfDuty>> GetCasesByTypeAsync(LodType caseType)
+        public async Task<IEnumerable<LineOfDutyCase>> GetCasesByTypeAsync(LineOfDutyType caseType)
         {
             await using var context = await _contextFactory.CreateDbContextAsync();
             
             return await context.LineOfDutyCases
                 .Include(c => c.TransitionHistory)
-                .Where(c => c.CaseType == caseType)
+                .Include(c => c.Member)
+                .Where(c => c.LineOfDutyType == caseType)
                 .ToListAsync();
         }
 
-        public async Task UpdateCaseAsync(LineOfDuty lodCase)
+        public async Task UpdateCaseAsync(LineOfDutyCase lodCase)
         {
             ArgumentNullException.ThrowIfNull(lodCase);
             
@@ -93,7 +99,7 @@ namespace StateMachineExperiments.Services
             await context.SaveChangesAsync();
         }
 
-        public async Task AddTransitionHistoryAsync(LodStateTransitionHistory history)
+        public async Task AddTransitionHistoryAsync(LineOfDutyStateTransitionHistory history)
         {
             ArgumentNullException.ThrowIfNull(history);
             
@@ -104,7 +110,7 @@ namespace StateMachineExperiments.Services
             await context.SaveChangesAsync();
         }
 
-        public async Task<List<LodStateTransitionHistory>> GetTransitionHistoryAsync(int caseId)
+        public async Task<List<LineOfDutyStateTransitionHistory>> GetTransitionHistoryAsync(int caseId)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(caseId);
 
@@ -114,6 +120,76 @@ namespace StateMachineExperiments.Services
                 .Where(h => h.LineOfDutyCaseId == caseId)
                 .OrderBy(h => h.Timestamp)
                 .ToListAsync();
+        }
+
+        public async Task<Member> CreateMemberAsync(string cardId, string name, string? rank = null, string? unit = null, string? email = null, string? phone = null)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(cardId);
+            ArgumentException.ThrowIfNullOrWhiteSpace(name);
+
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            
+            var entity = context.Members.Add(new Member
+            {
+                CardId = cardId,
+                Name = name,
+                Rank = rank,
+                Unit = unit,
+                Email = email,
+                Phone = phone,
+                CreatedDate = DateTime.UtcNow,
+                LastModifiedDate = DateTime.UtcNow,
+                IsActive = true
+            });
+
+            await context.SaveChangesAsync();
+
+            return entity.Entity;
+        }
+
+        public async Task<Member?> GetMemberAsync(int memberId)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(memberId);
+            
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            
+            return await context.Members
+                .Include(m => m.LineOfDutyCases)
+                .FirstOrDefaultAsync(m => m.Id == memberId);
+        }
+
+        public async Task<Member?> GetMemberByCardIdAsync(string cardId)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(cardId);
+            
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            
+            return await context.Members
+                .Include(m => m.LineOfDutyCases)
+                .FirstOrDefaultAsync(m => m.CardId == cardId);
+        }
+
+        public async Task<IEnumerable<Member>> GetAllMembersAsync()
+        {
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            
+            return await context.Members
+                .Include(m => m.LineOfDutyCases)
+                .Where(m => m.IsActive)
+                .OrderBy(m => m.Name)
+                .ToListAsync();
+        }
+
+        public async Task UpdateMemberAsync(Member member)
+        {
+            ArgumentNullException.ThrowIfNull(member);
+            
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            
+            member.LastModifiedDate = DateTime.UtcNow;
+            context.Members.Update(member);
+            
+            await context.SaveChangesAsync();
         }
     }
 }

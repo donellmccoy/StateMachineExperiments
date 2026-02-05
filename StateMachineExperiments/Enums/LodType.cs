@@ -3,7 +3,7 @@ namespace StateMachineExperiments.Enums
     /// <summary>
     /// Discriminator enum for Line of Duty case types.
     /// </summary>
-    public enum LodType
+    public enum LineOfDutyType
     {
         /// <summary>
         /// Informal LOD case - standard processing path with optional reviews.

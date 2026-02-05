@@ -16,25 +16,24 @@ namespace StateMachineExperiments.Services
         /// </summary>
         /// <param name="caseType">The type of case (Informal or Formal).</param>
         /// <param name="caseNumber">Unique case number identifier.</param>
-        /// <param name="memberId">Optional member ID.</param>
-        /// <param name="memberName">Optional member name.</param>
+        /// <param name="memberId">The member ID (foreign key to Member entity).</param>
         /// <param name="isDeathCase">Whether this is a death case (Formal cases only).</param>
         /// <returns>The newly created LOD case.</returns>
-        Task<LineOfDuty> CreateNewCaseAsync(LodType caseType, string caseNumber, string? memberId = null, string? memberName = null, bool isDeathCase = false);
+        Task<LineOfDutyCase> CreateNewCaseAsync(LineOfDutyType caseType, string caseNumber, int memberId, bool isDeathCase = false);
         
         /// <summary>
         /// Retrieves a case by its database ID.
         /// </summary>
         /// <param name="caseId">The database ID of the case.</param>
         /// <returns>The case if found, otherwise null.</returns>
-        Task<LineOfDuty?> GetCaseAsync(int caseId);
+        Task<LineOfDutyCase?> GetCaseAsync(int caseId);
         
         /// <summary>
         /// Retrieves a case by its case number.
         /// </summary>
         /// <param name="caseNumber">The unique case number.</param>
         /// <returns>The case if found, otherwise null.</returns>
-        Task<LineOfDuty?> GetCaseByCaseNumberAsync(string caseNumber);
+        Task<LineOfDutyCase?> GetCaseByCaseNumberAsync(string caseNumber);
         
         /// <summary>
         /// Fires a trigger to transition the case to a new state.
@@ -42,7 +41,7 @@ namespace StateMachineExperiments.Services
         /// <param name="caseId">The ID of the case to transition.</param>
         /// <param name="trigger">The trigger to fire.</param>
         /// <param name="notes">Optional notes about the transition.</param>
-        Task FireTriggerAsync(int caseId, LodTrigger trigger, string? notes = null);
+        Task FireTriggerAsync(int caseId, LineOfDutyTrigger trigger, string? notes = null);
         
         /// <summary>
         /// Fires a trigger to transition the case to a new state.
@@ -50,14 +49,14 @@ namespace StateMachineExperiments.Services
         /// <param name="lodCase">The LOD case instance to transition.</param>
         /// <param name="trigger">The trigger to fire.</param>
         /// <param name="notes">Optional notes about the transition.</param>
-        Task FireTriggerAsync(LineOfDuty lodCase, LodTrigger trigger, string? notes = null);
+        Task FireTriggerAsync(LineOfDutyCase lodCase, LineOfDutyTrigger trigger, string? notes = null);
         
         /// <summary>
         /// Retrieves the complete transition history for a case.
         /// </summary>
         /// <param name="caseId">The ID of the case.</param>
         /// <returns>List of all state transitions for the case.</returns>
-        Task<List<LodStateTransitionHistory>> GetCaseHistoryAsync(int caseId);
+        Task<List<LineOfDutyStateTransitionHistory>> GetCaseHistoryAsync(int caseId);
         
         /// <summary>
         /// Gets the list of permitted triggers for the case in its current state.
@@ -72,7 +71,7 @@ namespace StateMachineExperiments.Services
         /// <param name="caseId">The ID of the case.</param>
         /// <param name="trigger">The trigger to check.</param>
         /// <returns>True if the trigger can be fired, otherwise false.</returns>
-        Task<bool> CanFireAsync(int caseId, LodTrigger trigger);
+        Task<bool> CanFireAsync(int caseId, LineOfDutyTrigger trigger);
         
         /// <summary>
         /// Validates whether a trigger can be fired on a case before attempting the transition.
@@ -80,13 +79,13 @@ namespace StateMachineExperiments.Services
         /// <param name="caseId">The ID of the case.</param>
         /// <param name="trigger">The trigger to validate.</param>
         /// <returns>Validation result indicating success or failure with error messages.</returns>
-        Task<ValidationResult> ValidateTransitionAsync(int caseId, LodTrigger trigger);
+        Task<ValidationResult> ValidateTransitionAsync(int caseId, LineOfDutyTrigger trigger);
         
         /// <summary>
         /// Determines the authority level responsible for a given state.
         /// </summary>
         /// <param name="state">The LOD state.</param>
         /// <returns>The responsible authority.</returns>
-        LodAuthority GetCurrentAuthority(LodState state);
+        LodAuthority GetCurrentAuthority(LineOfDutyState state);
     }
 }

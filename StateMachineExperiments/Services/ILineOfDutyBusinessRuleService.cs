@@ -7,15 +7,15 @@ namespace StateMachineExperiments.Services
     public interface ILineOfDutyBusinessRuleService
     {
         // Informal LOD rules
-        bool RequiresLegalReview(LineOfDuty lodCase);
-        bool RequiresWingReview(LineOfDuty lodCase);
+        bool RequiresLegalReview(LineOfDutyCase lodCase);
+        bool RequiresWingReview(LineOfDutyCase lodCase);
         
         // Formal LOD rules
-        bool RequiresToxicology(LineOfDuty lodCase);
-        bool CanProceedFromInvestigation(LineOfDuty lodCase);
+        bool RequiresToxicology(LineOfDutyCase lodCase);
+        bool CanProceedFromInvestigation(LineOfDutyCase lodCase);
         
         // Common rules
-        bool IsAppealEligible(LineOfDuty lodCase, DateTime appealDate);
-        void ApplyBusinessRules(LineOfDuty lodCase);
+        bool IsAppealEligible(LineOfDutyCase lodCase, DateTime appealDate);
+        void ApplyBusinessRules(LineOfDutyCase lodCase);
     }
 }

@@ -9,6 +9,6 @@ namespace StateMachineExperiments.Factories
     /// </summary>
     public interface ILodStateMachineFactory
     {
-        StateMachine<LodState, LodTrigger> CreateStateMachine(LineOfDuty lodCase);
+        StateMachine<LineOfDutyState, LineOfDutyTrigger> CreateStateMachine(LineOfDutyCase lodCase);
     }
 }

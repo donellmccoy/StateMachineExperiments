@@ -1,7 +1,6 @@
 using StateMachineExperiments.Enums;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace StateMachineExperiments.Models
 {
@@ -10,7 +9,7 @@ namespace StateMachineExperiments.Models
     /// Supports both Informal and Formal LOD case types through a discriminator enum.
     /// Includes optimistic concurrency control and type-specific business logic.
     /// </summary>
-    public class LineOfDuty
+    public class LineOfDutyCase
     {
         /// <summary>
         /// Gets or sets the unique database identifier.
@@ -20,22 +19,32 @@ namespace StateMachineExperiments.Models
         /// <summary>
         /// Gets or sets the discriminator indicating the type of LOD case (Informal or Formal).
         /// </summary>
-        public LodType CaseType { get; set; } = LodType.Informal;
+        public LineOfDutyType LineOfDutyType { get; set; } = LineOfDutyType.Informal;
         
         /// <summary>
         /// Gets or sets the unique case number (e.g., LOD-2026-001 or FORMAL-LOD-2026-001).
         /// </summary>
-        public string CaseNumber { get; set; } = string.Empty;
+        public required string CaseNumber { get; set; } = string.Empty;
         
         /// <summary>
         /// Gets or sets the current state of the case in the workflow.
         /// </summary>
-        public LodState CurrentState { get; set; } = LodState.Start;
+        public LineOfDutyState LineOfDutyState { get; set; } = LineOfDutyState.Start;
         
         /// <summary>
         /// Gets or sets the date and time when the case was created.
         /// </summary>
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+
+        /// <summary>
+        /// Gets or sets the ID of the user who created the case.
+        /// </summary>
+        public int CreatedByUserId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the ID of the user who last modified the case. 
+        /// </summary>
+        public int LastModifiedByUserId { get; set; }
         
         /// <summary>
         /// Gets or sets the date and time when the case was last modified.
@@ -43,20 +52,19 @@ namespace StateMachineExperiments.Models
         public DateTime LastModifiedDate { get; set; } = DateTime.UtcNow;
         
         /// <summary>
-        /// Gets or sets the member ID associated with the case.
+        /// Gets or sets the member ID associated with the case (foreign key).
         /// </summary>
-        public string? MemberId { get; set; }
+        public int MemberId { get; set; }
         
         /// <summary>
-        /// Gets or sets the member name associated with the case.
+        /// Gets or sets the member associated with this case.
         /// </summary>
-        public string? MemberName { get; set; }
-        
+        public Member? Member { get; set; }
+                
         /// <summary>
         /// Gets or sets the row version for optimistic concurrency control.
         /// Updated automatically by EF Core on each save.
         /// </summary>
-        [Timestamp]
         public byte[]? RowVersion { get; set; }
         
         /// <summary>
@@ -134,8 +142,18 @@ namespace StateMachineExperiments.Models
         public string? DeterminationResult { get; set; }
         
         /// <summary>
-        /// Gets or sets the collection of state transitions for this case.
+        /// Gets or sets the medical information associated with this case.
         /// </summary>
-        public ICollection<LodStateTransitionHistory> TransitionHistory { get; set; } = [];
+        public Medical? Medical { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the collection of state transitions for this case.
+        /// </summary>unit-specific information associated with this case.
+        /// </summary>
+        public Unit? Unit { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the 
+        public ICollection<LineOfDutyStateTransitionHistory> TransitionHistory { get; set; } = [];
     }
 }

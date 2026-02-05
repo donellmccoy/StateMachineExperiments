@@ -11,13 +11,20 @@ namespace StateMachineExperiments.Services
     /// </summary>
     public interface ILineOfDutyDataService
     {
-        Task<LineOfDuty> CreateNewCaseAsync(LodType caseType, string caseNumber, string? memberId = null, string? memberName = null, bool isDeathCase = false);
-        Task<LineOfDuty?> GetCaseAsync(int caseId);
-        Task<LineOfDuty?> GetCaseByCaseNumberAsync(string caseNumber);
-        Task<IEnumerable<LineOfDuty>> GetAllCasesAsync();
-        Task<IEnumerable<LineOfDuty>> GetCasesByTypeAsync(LodType caseType);
-        Task UpdateCaseAsync(LineOfDuty lodCase);
-        Task AddTransitionHistoryAsync(LodStateTransitionHistory history);
-        Task<List<LodStateTransitionHistory>> GetTransitionHistoryAsync(int caseId);
+        Task<LineOfDutyCase> CreateNewCaseAsync(LineOfDutyType caseType, string caseNumber, int memberId, bool isDeathCase = false);
+        Task<LineOfDutyCase?> GetCaseAsync(int caseId);
+        Task<LineOfDutyCase?> GetCaseByCaseNumberAsync(string caseNumber);
+        Task<IEnumerable<LineOfDutyCase>> GetAllCasesAsync();
+        Task<IEnumerable<LineOfDutyCase>> GetCasesByTypeAsync(LineOfDutyType caseType);
+        Task UpdateCaseAsync(LineOfDutyCase lodCase);
+        Task AddTransitionHistoryAsync(LineOfDutyStateTransitionHistory history);
+        Task<List<LineOfDutyStateTransitionHistory>> GetTransitionHistoryAsync(int caseId);
+        
+        // Member management methods
+        Task<Member> CreateMemberAsync(string cardId, string name, string? rank = null, string? unit = null, string? email = null, string? phone = null);
+        Task<Member?> GetMemberAsync(int memberId);
+        Task<Member?> GetMemberByCardIdAsync(string cardId);
+        Task<IEnumerable<Member>> GetAllMembersAsync();
+        Task UpdateMemberAsync(Member member);
     }
 }

@@ -14,12 +14,12 @@ namespace StateMachineExperiments.Services
             _businessRules = businessRules;
         }
 
-        public Task<ValidationResult> ValidateTransitionAsync(LineOfDuty lodCase, LodTrigger trigger)
+        public Task<ValidationResult> ValidateTransitionAsync(LineOfDutyCase lodCase, LineOfDutyTrigger trigger)
         {
             var result = new ValidationResult { IsValid = true };
 
             // Case type-specific validation
-            if (lodCase.CaseType == LodType.Formal)
+            if (lodCase.LineOfDutyType == LineOfDutyType.Formal)
             {
                 return ValidateFormalTransition(lodCase, trigger);
             }
@@ -29,11 +29,11 @@ namespace StateMachineExperiments.Services
             }
         }
 
-        private Task<ValidationResult> ValidateInformalTransition(LineOfDuty lodCase, LodTrigger trigger)
+        private Task<ValidationResult> ValidateInformalTransition(LineOfDutyCase lodCase, LineOfDutyTrigger trigger)
         {
             // Add Informal-specific validation rules here
             // For example, checking if legal review is required before proceeding
-            if (trigger == LodTrigger.SkipToAdjudication && lodCase.RequiresLegalReview)
+            if (trigger == LineOfDutyTrigger.SkipToAdjudication && lodCase.RequiresLegalReview)
             {
                 return Task.FromResult(ValidationResult.Failure("Cannot skip to adjudication when legal review is required."));
             }
@@ -41,11 +41,11 @@ namespace StateMachineExperiments.Services
             return Task.FromResult(ValidationResult.Success());
         }
 
-        private Task<ValidationResult> ValidateFormalTransition(LineOfDuty lodCase, LodTrigger trigger)
+        private Task<ValidationResult> ValidateFormalTransition(LineOfDutyCase lodCase, LineOfDutyTrigger trigger)
         {
             // Add Formal-specific validation rules here
             // For example, checking if toxicology is complete before proceeding from investigation
-            if (trigger == LodTrigger.InvestigationComplete && !_businessRules.CanProceedFromInvestigation(lodCase))
+            if (trigger == LineOfDutyTrigger.InvestigationComplete && !_businessRules.CanProceedFromInvestigation(lodCase))
             {
                 return Task.FromResult(ValidationResult.Failure("Cannot complete investigation until required toxicology reports are received."));
             }

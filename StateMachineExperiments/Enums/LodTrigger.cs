@@ -4,7 +4,7 @@ namespace StateMachineExperiments.Enums
     /// Represents the triggers that cause state transitions in LOD workflows.
     /// Includes triggers for both Informal and Formal LOD processes.
     /// </summary>
-    public enum LodTrigger
+    public enum LineOfDutyTrigger
     {
         // ===== Common Triggers (used by both workflows) =====
         

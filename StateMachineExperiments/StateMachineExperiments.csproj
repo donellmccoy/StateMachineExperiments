@@ -7,15 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Migrations\**" />
     <Compile Remove="Pages\InformalLod.razor.cs" />
     <Compile Remove="Pages\FormalLod.razor.cs" />
     <Compile Remove="Common\Data\LodDbContextFactory.cs" />
-    <Content Remove="Migrations\**" />
     <Content Remove="Pages\InformalLod.razor" />
     <Content Remove="Pages\FormalLod.razor" />
-    <EmbeddedResource Remove="Migrations\**" />
-    <None Remove="Migrations\**" />
   </ItemGroup>
 
   <ItemGroup>

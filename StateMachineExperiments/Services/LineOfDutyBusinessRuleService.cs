@@ -20,9 +20,9 @@ namespace StateMachineExperiments.Services
         /// <summary>
         /// Business rule for Informal LOD: Legal review required if injury severity > threshold OR estimated cost > threshold
         /// </summary>
-        public bool RequiresLegalReview(LineOfDuty lodCase)
+        public bool RequiresLegalReview(LineOfDutyCase lodCase)
         {
-            if (lodCase.CaseType != LodType.Informal)
+            if (lodCase.LineOfDutyType != LineOfDutyType.Informal)
                 return false;
 
             return (lodCase.InjurySeverity.HasValue && lodCase.InjurySeverity.Value > _settings.LegalReview.InjurySeverityThreshold) ||
@@ -32,9 +32,9 @@ namespace StateMachineExperiments.Services
         /// <summary>
         /// Business rule for Informal LOD: Wing review required if injury severity > threshold OR estimated cost > threshold
         /// </summary>
-        public bool RequiresWingReview(LineOfDuty lodCase)
+        public bool RequiresWingReview(LineOfDutyCase lodCase)
         {
-            if (lodCase.CaseType != LodType.Informal)
+            if (lodCase.LineOfDutyType != LineOfDutyType.Informal)
                 return false;
 
             return (lodCase.InjurySeverity.HasValue && lodCase.InjurySeverity.Value > _settings.WingReview.InjurySeverityThreshold) ||
@@ -46,9 +46,9 @@ namespace StateMachineExperiments.Services
         /// <summary>
         /// Business rule for Formal LOD: Toxicology required for suspicious circumstances or death cases
         /// </summary>
-        public bool RequiresToxicology(LineOfDuty lodCase)
+        public bool RequiresToxicology(LineOfDutyCase lodCase)
         {
-            if (lodCase.CaseType != LodType.Formal)
+            if (lodCase.LineOfDutyType != LineOfDutyType.Formal)
                 return false;
 
             // This would be determined by the investigating officer based on case specifics
@@ -59,9 +59,9 @@ namespace StateMachineExperiments.Services
         /// <summary>
         /// Business rule for Formal LOD: Can proceed from investigation only if toxicology is complete (if required)
         /// </summary>
-        public bool CanProceedFromInvestigation(LineOfDuty lodCase)
+        public bool CanProceedFromInvestigation(LineOfDutyCase lodCase)
         {
-            if (lodCase.CaseType != LodType.Formal)
+            if (lodCase.LineOfDutyType != LineOfDutyType.Formal)
                 return true;
 
             if (!lodCase.ToxicologyRequired)
@@ -80,11 +80,11 @@ namespace StateMachineExperiments.Services
         /// Formal regular cases: 30 days from notification
         /// Formal death cases (next of kin): 180 days from notification
         /// </summary>
-        public bool IsAppealEligible(LineOfDuty lodCase, DateTime appealDate)
+        public bool IsAppealEligible(LineOfDutyCase lodCase, DateTime appealDate)
         {
             // Find the notification date from transition history
             var notificationTransition = lodCase.TransitionHistory
-                .FirstOrDefault(t => t.ToState == LodState.Notification);
+                .FirstOrDefault(t => t.ToState == LineOfDutyState.Notification);
 
             if (notificationTransition == null)
             {
@@ -94,7 +94,7 @@ namespace StateMachineExperiments.Services
             var daysSinceNotification = (appealDate - notificationTransition.Timestamp).TotalDays;
             
             int appealDeadlineDays;
-            if (lodCase.CaseType == LodType.Informal)
+            if (lodCase.LineOfDutyType == LineOfDutyType.Informal)
             {
                 appealDeadlineDays = _settings.Appeal.DeadlineDays;
             }
@@ -109,9 +109,9 @@ namespace StateMachineExperiments.Services
         /// <summary>
         /// Apply all business rules to determine required reviews based on case type
         /// </summary>
-        public void ApplyBusinessRules(LineOfDuty lodCase)
+        public void ApplyBusinessRules(LineOfDutyCase lodCase)
         {
-            if (lodCase.CaseType == LodType.Informal)
+            if (lodCase.LineOfDutyType == LineOfDutyType.Informal)
             {
                 lodCase.RequiresLegalReview = RequiresLegalReview(lodCase);
                 lodCase.RequiresWingReview = RequiresWingReview(lodCase);

@@ -4,7 +4,7 @@ namespace StateMachineExperiments.Enums
     /// Represents the possible states in Line of Duty workflows (both Informal and Formal).
     /// Based on DAFI 36-2910 for AFRC LOD processing.
     /// </summary>
-    public enum LodState
+    public enum LineOfDutyState
     {
         // Common states
         /// <summary>Initial state before processing begins.</summary>

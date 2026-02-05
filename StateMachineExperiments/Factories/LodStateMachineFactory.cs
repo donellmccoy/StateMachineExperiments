@@ -12,100 +12,100 @@ namespace StateMachineExperiments.Factories
     /// </summary>
     public class LodStateMachineFactory : ILodStateMachineFactory
     {
-        public StateMachine<LodState, LodTrigger> CreateStateMachine(LineOfDuty lodCase)
+        public StateMachine<LineOfDutyState, LineOfDutyTrigger> CreateStateMachine(LineOfDutyCase lodCase)
         {
-            return lodCase.CaseType == LodType.Informal 
+            return lodCase.LineOfDutyType == LineOfDutyType.Informal 
                 ? CreateInformalStateMachine(lodCase) 
                 : CreateFormalStateMachine(lodCase);
         }
 
         #region Informal LOD State Machine
 
-        private static StateMachine<LodState, LodTrigger> CreateInformalStateMachine(LineOfDuty lodCase)
+        private static StateMachine<LineOfDutyState, LineOfDutyTrigger> CreateInformalStateMachine(LineOfDutyCase lodCase)
         {
-            var stateMachine = new StateMachine<LodState, LodTrigger>(lodCase.CurrentState);
+            var stateMachine = new StateMachine<LineOfDutyState, LineOfDutyTrigger>(lodCase.LineOfDutyState);
 
             // Configure Start state
-            stateMachine.Configure(LodState.Start)
-                .Permit(LodTrigger.ProcessInitiated, LodState.MemberReports)
-                .OnExitAsync(async () => await OnStateExitAsync(LodState.Start, lodCase));
+            stateMachine.Configure(LineOfDutyState.Start)
+                .Permit(LineOfDutyTrigger.ProcessInitiated, LineOfDutyState.MemberReports)
+                .OnExitAsync(async () => await OnStateExitAsync(LineOfDutyState.Start, lodCase));
 
             // Configure MemberReports state
-            stateMachine.Configure(LodState.MemberReports)
-                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.MemberReports, lodCase))
-                .Permit(LodTrigger.ConditionReported, LodState.LodInitiation)
-                .OnExitAsync(async () => await OnStateExitAsync(LodState.MemberReports, lodCase));
+            stateMachine.Configure(LineOfDutyState.MemberReports)
+                .OnEntryAsync(async () => await OnStateEntryAsync(LineOfDutyState.MemberReports, lodCase))
+                .Permit(LineOfDutyTrigger.ConditionReported, LineOfDutyState.LodInitiation)
+                .OnExitAsync(async () => await OnStateExitAsync(LineOfDutyState.MemberReports, lodCase));
 
             // Configure LodInitiation state
-            stateMachine.Configure(LodState.LodInitiation)
-                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.LodInitiation, lodCase))
-                .Permit(LodTrigger.InitiationComplete, LodState.MedicalAssessment)
-                .OnExitAsync(async () => await OnStateExitAsync(LodState.LodInitiation, lodCase));
+            stateMachine.Configure(LineOfDutyState.LodInitiation)
+                .OnEntryAsync(async () => await OnStateEntryAsync(LineOfDutyState.LodInitiation, lodCase))
+                .Permit(LineOfDutyTrigger.InitiationComplete, LineOfDutyState.MedicalAssessment)
+                .OnExitAsync(async () => await OnStateExitAsync(LineOfDutyState.LodInitiation, lodCase));
 
             // Configure MedicalAssessment state
-            stateMachine.Configure(LodState.MedicalAssessment)
-                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.MedicalAssessment, lodCase))
-                .Permit(LodTrigger.AssessmentDone, LodState.CommanderReview)
-                .OnExitAsync(async () => await OnStateExitAsync(LodState.MedicalAssessment, lodCase));
+            stateMachine.Configure(LineOfDutyState.MedicalAssessment)
+                .OnEntryAsync(async () => await OnStateEntryAsync(LineOfDutyState.MedicalAssessment, lodCase))
+                .Permit(LineOfDutyTrigger.AssessmentDone, LineOfDutyState.CommanderReview)
+                .OnExitAsync(async () => await OnStateExitAsync(LineOfDutyState.MedicalAssessment, lodCase));
 
             // Configure CommanderReview state - dynamic routing based on case requirements
-            stateMachine.Configure(LodState.CommanderReview)
-                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.CommanderReview, lodCase))
-                .PermitIf(LodTrigger.ReviewFinished, LodState.OptionalLegal, () => lodCase.RequiresLegalReview)
-                .Permit(LodTrigger.SkipToAdjudication, LodState.BoardAdjudication)
-                .OnExitAsync(async () => await OnStateExitAsync(LodState.CommanderReview, lodCase));
+            stateMachine.Configure(LineOfDutyState.CommanderReview)
+                .OnEntryAsync(async () => await OnStateEntryAsync(LineOfDutyState.CommanderReview, lodCase))
+                .PermitIf(LineOfDutyTrigger.ReviewFinished, LineOfDutyState.OptionalLegal, () => lodCase.RequiresLegalReview)
+                .Permit(LineOfDutyTrigger.SkipToAdjudication, LineOfDutyState.BoardAdjudication)
+                .OnExitAsync(async () => await OnStateExitAsync(LineOfDutyState.CommanderReview, lodCase));
 
             // Configure OptionalLegal state
-            stateMachine.Configure(LodState.OptionalLegal)
-                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.OptionalLegal, lodCase))
-                .PermitIf(LodTrigger.LegalDone, LodState.OptionalWing, () => lodCase.RequiresWingReview)
-                .Permit(LodTrigger.SkipWingReview, LodState.BoardAdjudication)
-                .OnExitAsync(async () => await OnStateExitAsync(LodState.OptionalLegal, lodCase));
+            stateMachine.Configure(LineOfDutyState.OptionalLegal)
+                .OnEntryAsync(async () => await OnStateEntryAsync(LineOfDutyState.OptionalLegal, lodCase))
+                .PermitIf(LineOfDutyTrigger.LegalDone, LineOfDutyState.OptionalWing, () => lodCase.RequiresWingReview)
+                .Permit(LineOfDutyTrigger.SkipWingReview, LineOfDutyState.BoardAdjudication)
+                .OnExitAsync(async () => await OnStateExitAsync(LineOfDutyState.OptionalLegal, lodCase));
 
             // Configure OptionalWing state
-            stateMachine.Configure(LodState.OptionalWing)
-                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.OptionalWing, lodCase))
-                .Permit(LodTrigger.WingDone, LodState.BoardAdjudication)
-                .OnExitAsync(async () => await OnStateExitAsync(LodState.OptionalWing, lodCase));
+            stateMachine.Configure(LineOfDutyState.OptionalWing)
+                .OnEntryAsync(async () => await OnStateEntryAsync(LineOfDutyState.OptionalWing, lodCase))
+                .Permit(LineOfDutyTrigger.WingDone, LineOfDutyState.BoardAdjudication)
+                .OnExitAsync(async () => await OnStateExitAsync(LineOfDutyState.OptionalWing, lodCase));
 
             // Configure BoardAdjudication state
-            stateMachine.Configure(LodState.BoardAdjudication)
-                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.BoardAdjudication, lodCase))
-                .Permit(LodTrigger.AdjudicationComplete, LodState.Determination)
-                .OnExitAsync(async () => await OnStateExitAsync(LodState.BoardAdjudication, lodCase));
+            stateMachine.Configure(LineOfDutyState.BoardAdjudication)
+                .OnEntryAsync(async () => await OnStateEntryAsync(LineOfDutyState.BoardAdjudication, lodCase))
+                .Permit(LineOfDutyTrigger.AdjudicationComplete, LineOfDutyState.Determination)
+                .OnExitAsync(async () => await OnStateExitAsync(LineOfDutyState.BoardAdjudication, lodCase));
 
             // Configure Determination state
-            stateMachine.Configure(LodState.Determination)
-                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.Determination, lodCase))
-                .Permit(LodTrigger.DeterminationFinalized, LodState.Notification)
-                .OnExitAsync(async () => await OnStateExitAsync(LodState.Determination, lodCase));
+            stateMachine.Configure(LineOfDutyState.Determination)
+                .OnEntryAsync(async () => await OnStateEntryAsync(LineOfDutyState.Determination, lodCase))
+                .Permit(LineOfDutyTrigger.DeterminationFinalized, LineOfDutyState.Notification)
+                .OnExitAsync(async () => await OnStateExitAsync(LineOfDutyState.Determination, lodCase));
 
             // Configure Notification state
-            stateMachine.Configure(LodState.Notification)
-                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.Notification, lodCase))
-                .Permit(LodTrigger.AppealFiled, LodState.Appeal)
-                .Permit(LodTrigger.NotificationComplete, LodState.End)
-                .OnExitAsync(async () => await OnStateExitAsync(LodState.Notification, lodCase));
+            stateMachine.Configure(LineOfDutyState.Notification)
+                .OnEntryAsync(async () => await OnStateEntryAsync(LineOfDutyState.Notification, lodCase))
+                .Permit(LineOfDutyTrigger.AppealFiled, LineOfDutyState.Appeal)
+                .Permit(LineOfDutyTrigger.NotificationComplete, LineOfDutyState.End)
+                .OnExitAsync(async () => await OnStateExitAsync(LineOfDutyState.Notification, lodCase));
 
             // Configure Appeal state
-            stateMachine.Configure(LodState.Appeal)
-                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.Appeal, lodCase))
-                .Permit(LodTrigger.AppealResolved, LodState.End)
-                .OnExitAsync(async () => await OnStateExitAsync(LodState.Appeal, lodCase));
+            stateMachine.Configure(LineOfDutyState.Appeal)
+                .OnEntryAsync(async () => await OnStateEntryAsync(LineOfDutyState.Appeal, lodCase))
+                .Permit(LineOfDutyTrigger.AppealResolved, LineOfDutyState.End)
+                .OnExitAsync(async () => await OnStateExitAsync(LineOfDutyState.Appeal, lodCase));
 
             // Configure End state
-            stateMachine.Configure(LodState.End)
-                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.End, lodCase));
+            stateMachine.Configure(LineOfDutyState.End)
+                .OnEntryAsync(async () => await OnStateEntryAsync(LineOfDutyState.End, lodCase));
 
             return stateMachine;
 
-            static async Task OnStateEntryAsync(LodState state, LineOfDuty lodCase)
+            static async Task OnStateEntryAsync(LineOfDutyState state, LineOfDutyCase lodCase)
             {
                 Console.WriteLine($"[INFORMAL] [ENTRY] Entering state: {state} for case {lodCase.CaseNumber}");
                 await Task.CompletedTask;
             }
 
-            static async Task OnStateExitAsync(LodState state, LineOfDuty lodCase)
+            static async Task OnStateExitAsync(LineOfDutyState state, LineOfDutyCase lodCase)
             {
                 Console.WriteLine($"[INFORMAL] [EXIT] Exiting state: {state} for case {lodCase.CaseNumber}");
                 await Task.CompletedTask;
@@ -116,89 +116,89 @@ namespace StateMachineExperiments.Factories
 
         #region Formal LOD State Machine
 
-        private static StateMachine<LodState, LodTrigger> CreateFormalStateMachine(LineOfDuty lodCase)
+        private static StateMachine<LineOfDutyState, LineOfDutyTrigger> CreateFormalStateMachine(LineOfDutyCase lodCase)
         {
-            var stateMachine = new StateMachine<LodState, LodTrigger>(lodCase.CurrentState);
+            var stateMachine = new StateMachine<LineOfDutyState, LineOfDutyTrigger>(lodCase.LineOfDutyState);
 
             // Configure Start state
-            stateMachine.Configure(LodState.Start)
-                .Permit(LodTrigger.ProcessInitiated, LodState.MemberReports)
-                .OnExitAsync(async () => await OnStateExitAsync(LodState.Start, lodCase));
+            stateMachine.Configure(LineOfDutyState.Start)
+                .Permit(LineOfDutyTrigger.ProcessInitiated, LineOfDutyState.MemberReports)
+                .OnExitAsync(async () => await OnStateExitAsync(LineOfDutyState.Start, lodCase));
 
             // Configure MemberReports state
-            stateMachine.Configure(LodState.MemberReports)
-                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.MemberReports, lodCase))
-                .Permit(LodTrigger.ConditionReported, LodState.FormalInitiation)
-                .OnExitAsync(async () => await OnStateExitAsync(LodState.MemberReports, lodCase));
+            stateMachine.Configure(LineOfDutyState.MemberReports)
+                .OnEntryAsync(async () => await OnStateEntryAsync(LineOfDutyState.MemberReports, lodCase))
+                .Permit(LineOfDutyTrigger.ConditionReported, LineOfDutyState.FormalInitiation)
+                .OnExitAsync(async () => await OnStateExitAsync(LineOfDutyState.MemberReports, lodCase));
 
             // Configure FormalInitiation state
-            stateMachine.Configure(LodState.FormalInitiation)
-                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.FormalInitiation, lodCase))
-                .Permit(LodTrigger.QuestionableDetected, LodState.AppointingOfficer)
-                .OnExitAsync(async () => await OnStateExitAsync(LodState.FormalInitiation, lodCase));
+            stateMachine.Configure(LineOfDutyState.FormalInitiation)
+                .OnEntryAsync(async () => await OnStateEntryAsync(LineOfDutyState.FormalInitiation, lodCase))
+                .Permit(LineOfDutyTrigger.QuestionableDetected, LineOfDutyState.AppointingOfficer)
+                .OnExitAsync(async () => await OnStateExitAsync(LineOfDutyState.FormalInitiation, lodCase));
 
             // Configure AppointingOfficer state
-            stateMachine.Configure(LodState.AppointingOfficer)
-                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.AppointingOfficer, lodCase))
-                .Permit(LodTrigger.OfficerAppointed, LodState.Investigation)
-                .OnExitAsync(async () => await OnStateExitAsync(LodState.AppointingOfficer, lodCase));
+            stateMachine.Configure(LineOfDutyState.AppointingOfficer)
+                .OnEntryAsync(async () => await OnStateEntryAsync(LineOfDutyState.AppointingOfficer, lodCase))
+                .Permit(LineOfDutyTrigger.OfficerAppointed, LineOfDutyState.Investigation)
+                .OnExitAsync(async () => await OnStateExitAsync(LineOfDutyState.AppointingOfficer, lodCase));
 
             // Configure Investigation state
-            stateMachine.Configure(LodState.Investigation)
-                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.Investigation, lodCase))
-                .Permit(LodTrigger.InvestigationComplete, LodState.WingLegalReview)
-                .OnExitAsync(async () => await OnStateExitAsync(LodState.Investigation, lodCase));
+            stateMachine.Configure(LineOfDutyState.Investigation)
+                .OnEntryAsync(async () => await OnStateEntryAsync(LineOfDutyState.Investigation, lodCase))
+                .Permit(LineOfDutyTrigger.InvestigationComplete, LineOfDutyState.WingLegalReview)
+                .OnExitAsync(async () => await OnStateExitAsync(LineOfDutyState.Investigation, lodCase));
 
             // Configure WingLegalReview state
-            stateMachine.Configure(LodState.WingLegalReview)
-                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.WingLegalReview, lodCase))
-                .Permit(LodTrigger.LegalReviewComplete, LodState.WingCommanderReview)
-                .OnExitAsync(async () => await OnStateExitAsync(LodState.WingLegalReview, lodCase));
+            stateMachine.Configure(LineOfDutyState.WingLegalReview)
+                .OnEntryAsync(async () => await OnStateEntryAsync(LineOfDutyState.WingLegalReview, lodCase))
+                .Permit(LineOfDutyTrigger.LegalReviewComplete, LineOfDutyState.WingCommanderReview)
+                .OnExitAsync(async () => await OnStateExitAsync(LineOfDutyState.WingLegalReview, lodCase));
 
             // Configure WingCommanderReview state
-            stateMachine.Configure(LodState.WingCommanderReview)
-                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.WingCommanderReview, lodCase))
-                .Permit(LodTrigger.WingReviewComplete, LodState.BoardAdjudication)
-                .OnExitAsync(async () => await OnStateExitAsync(LodState.WingCommanderReview, lodCase));
+            stateMachine.Configure(LineOfDutyState.WingCommanderReview)
+                .OnEntryAsync(async () => await OnStateEntryAsync(LineOfDutyState.WingCommanderReview, lodCase))
+                .Permit(LineOfDutyTrigger.WingReviewComplete, LineOfDutyState.BoardAdjudication)
+                .OnExitAsync(async () => await OnStateExitAsync(LineOfDutyState.WingCommanderReview, lodCase));
 
             // Configure BoardAdjudication state
-            stateMachine.Configure(LodState.BoardAdjudication)
-                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.BoardAdjudication, lodCase))
-                .Permit(LodTrigger.AdjudicationComplete, LodState.Determination)
-                .OnExitAsync(async () => await OnStateExitAsync(LodState.BoardAdjudication, lodCase));
+            stateMachine.Configure(LineOfDutyState.BoardAdjudication)
+                .OnEntryAsync(async () => await OnStateEntryAsync(LineOfDutyState.BoardAdjudication, lodCase))
+                .Permit(LineOfDutyTrigger.AdjudicationComplete, LineOfDutyState.Determination)
+                .OnExitAsync(async () => await OnStateExitAsync(LineOfDutyState.BoardAdjudication, lodCase));
 
             // Configure Determination state
-            stateMachine.Configure(LodState.Determination)
-                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.Determination, lodCase))
-                .Permit(LodTrigger.DeterminationFinalized, LodState.Notification)
-                .OnExitAsync(async () => await OnStateExitAsync(LodState.Determination, lodCase));
+            stateMachine.Configure(LineOfDutyState.Determination)
+                .OnEntryAsync(async () => await OnStateEntryAsync(LineOfDutyState.Determination, lodCase))
+                .Permit(LineOfDutyTrigger.DeterminationFinalized, LineOfDutyState.Notification)
+                .OnExitAsync(async () => await OnStateExitAsync(LineOfDutyState.Determination, lodCase));
 
             // Configure Notification state
-            stateMachine.Configure(LodState.Notification)
-                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.Notification, lodCase))
-                .Permit(LodTrigger.AppealRequested, LodState.Appeal)
-                .Permit(LodTrigger.NoAppealRequested, LodState.End)
-                .OnExitAsync(async () => await OnStateExitAsync(LodState.Notification, lodCase));
+            stateMachine.Configure(LineOfDutyState.Notification)
+                .OnEntryAsync(async () => await OnStateEntryAsync(LineOfDutyState.Notification, lodCase))
+                .Permit(LineOfDutyTrigger.AppealRequested, LineOfDutyState.Appeal)
+                .Permit(LineOfDutyTrigger.NoAppealRequested, LineOfDutyState.End)
+                .OnExitAsync(async () => await OnStateExitAsync(LineOfDutyState.Notification, lodCase));
 
             // Configure Appeal state
-            stateMachine.Configure(LodState.Appeal)
-                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.Appeal, lodCase))
-                .Permit(LodTrigger.AppealResolved, LodState.End)
-                .OnExitAsync(async () => await OnStateExitAsync(LodState.Appeal, lodCase));
+            stateMachine.Configure(LineOfDutyState.Appeal)
+                .OnEntryAsync(async () => await OnStateEntryAsync(LineOfDutyState.Appeal, lodCase))
+                .Permit(LineOfDutyTrigger.AppealResolved, LineOfDutyState.End)
+                .OnExitAsync(async () => await OnStateExitAsync(LineOfDutyState.Appeal, lodCase));
 
             // Configure End state
-            stateMachine.Configure(LodState.End)
-                .OnEntryAsync(async () => await OnStateEntryAsync(LodState.End, lodCase));
+            stateMachine.Configure(LineOfDutyState.End)
+                .OnEntryAsync(async () => await OnStateEntryAsync(LineOfDutyState.End, lodCase));
 
             return stateMachine;
             
-            static async Task OnStateEntryAsync(LodState state, LineOfDuty lodCase)
+            static async Task OnStateEntryAsync(LineOfDutyState state, LineOfDutyCase lodCase)
             {
                 Console.WriteLine($"{(lodCase.IsDeathCase ? "[DEATH-EXPEDITED]" : "[FORMAL]")} [ENTRY] Entering state: {state} for case {lodCase.CaseNumber}");
                 await Task.CompletedTask;
             }
 
-            static async Task OnStateExitAsync(LodState state, LineOfDuty lodCase)
+            static async Task OnStateExitAsync(LineOfDutyState state, LineOfDutyCase lodCase)
             {
                 Console.WriteLine($"{(lodCase.IsDeathCase ? "[DEATH-EXPEDITED]" : "[FORMAL]")} [EXIT] Exiting state: {state} for case {lodCase.CaseNumber}");
                 await Task.CompletedTask;

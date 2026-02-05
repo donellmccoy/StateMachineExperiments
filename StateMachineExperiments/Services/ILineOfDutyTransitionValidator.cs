@@ -7,6 +7,6 @@ namespace StateMachineExperiments.Services
 {
     public interface ILineOfDutyTransitionValidator
     {
-        Task<ValidationResult> ValidateTransitionAsync(LineOfDuty lodCase, LodTrigger trigger);
+        Task<ValidationResult> ValidateTransitionAsync(LineOfDutyCase lodCase, LineOfDutyTrigger trigger);
     }
 }
