@@ -18,11 +18,6 @@ namespace StateMachineExperiments.Models
         public int LineOfDutyCaseId { get; set; }
         
         /// <summary>
-        /// Gets or sets the associated Line of Duty case.
-        /// </summary>
-        public LineOfDutyCase? LineOfDutyCase { get; set; }
-        
-        /// <summary>
         /// Gets or sets the member status at the time of the event.
         /// </summary>
         public string? MemberStatus { get; set; }
@@ -226,5 +221,12 @@ namespace StateMachineExperiments.Models
         /// Gets or sets whether the status worsened.
         /// </summary>
         public string? StatusWorsened { get; set; }
+        
+        // ========== NAVIGATION PROPERTIES ==========
+        
+        /// <summary>
+        /// Gets or sets the associated Line of Duty case.
+        /// </summary>
+        public LineOfDutyCase? LineOfDutyCase { get; set; }
     }
 }

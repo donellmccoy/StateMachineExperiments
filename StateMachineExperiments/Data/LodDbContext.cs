@@ -15,6 +15,16 @@ namespace StateMachineExperiments.Data
         public DbSet<Medical> Medicals { get; set; } = null!;
         
         public DbSet<Unit> Units { get; set; } = null!;
+        
+        public DbSet<Appeal> Appeals { get; set; } = null!;
+        
+        public DbSet<Comment> Comments { get; set; } = null!;
+        
+        public DbSet<Finding> Findings { get; set; } = null!;
+        
+        public DbSet<PostProcessing> PostProcessings { get; set; } = null!;
+        
+        public DbSet<ReinvestigationRequest> ReinvestigationRequests { get; set; } = null!;
 
         public LodDbContext(DbContextOptions<LodDbContext> options) : base(options)
         {
@@ -30,6 +40,11 @@ namespace StateMachineExperiments.Data
             modelBuilder.ApplyConfiguration(new LineOfDutyStateTransitionHistoryConfiguration());
             modelBuilder.ApplyConfiguration(new MedicalConfiguration());
             modelBuilder.ApplyConfiguration(new UnitConfiguration());
+            modelBuilder.ApplyConfiguration(new AppealConfiguration());
+            modelBuilder.ApplyConfiguration(new CommentConfiguration());
+            modelBuilder.ApplyConfiguration(new FindingConfiguration());
+            modelBuilder.ApplyConfiguration(new PostProcessingConfiguration());
+            modelBuilder.ApplyConfiguration(new ReinvestigationRequestConfiguration());
         }
     }
 }

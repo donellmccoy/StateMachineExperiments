@@ -18,11 +18,6 @@ namespace StateMachineExperiments.Models
         public int LineOfDutyCaseId { get; set; }
         
         /// <summary>
-        /// Gets or sets the associated Line of Duty case.
-        /// </summary>
-        public LineOfDutyCase? LineOfDutyCase { get; set; }
-        
-        /// <summary>
         /// Gets or sets the commander's circumstance details.
         /// </summary>
         public string? CommanderCircumstanceDetails { get; set; }
@@ -201,5 +196,12 @@ namespace StateMachineExperiments.Models
         /// Gets or sets whether the eight-year rule applies.
         /// </summary>
         public bool? EightYearRule { get; set; }
+        
+        // ========== NAVIGATION PROPERTIES ==========
+        
+        /// <summary>
+        /// Gets or sets the associated Line of Duty case.
+        /// </summary>
+        public LineOfDutyCase? LineOfDutyCase { get; set; }
     }
 }

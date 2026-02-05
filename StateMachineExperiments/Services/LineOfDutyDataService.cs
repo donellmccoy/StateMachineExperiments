@@ -134,7 +134,6 @@ namespace StateMachineExperiments.Services
                 CardId = cardId,
                 Name = name,
                 Rank = rank,
-                Unit = unit,
                 Email = email,
                 Phone = phone,
                 CreatedDate = DateTime.UtcNow,

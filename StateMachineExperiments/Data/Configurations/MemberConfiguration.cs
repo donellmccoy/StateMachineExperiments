@@ -34,6 +34,12 @@ namespace StateMachineExperiments.Data.Configurations
             
             builder.Property(e => e.Phone)
                 .HasMaxLength(20);
+            
+            // Configure relationship with Unit
+            builder.HasOne(e => e.Unit)
+                .WithMany()
+                .HasForeignKey(e => e.UnitId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

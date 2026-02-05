@@ -29,9 +29,9 @@ namespace StateMachineExperiments.Models
         public string? Rank { get; set; }
         
         /// <summary>
-        /// Gets or sets the member's unit assignment.
+        /// Gets or sets the unit ID associated with this member (foreign key).
         /// </summary>
-        public string? Unit { get; set; }
+        public int? UnitId { get; set; }
         
         /// <summary>
         /// Gets or sets the member's email address.
@@ -57,6 +57,13 @@ namespace StateMachineExperiments.Models
         /// Gets or sets whether the member is currently active.
         /// </summary>
         public bool IsActive { get; set; } = true;
+        
+        // ========== NAVIGATION PROPERTIES ==========
+        
+        /// <summary>
+        /// Gets or sets the member's unit assignment.
+        /// </summary>
+        public Unit? Unit { get; set; }
         
         /// <summary>
         /// Gets or sets the collection of LOD cases associated with this member.

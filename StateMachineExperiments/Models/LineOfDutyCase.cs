@@ -55,11 +55,6 @@ namespace StateMachineExperiments.Models
         /// Gets or sets the member ID associated with the case (foreign key).
         /// </summary>
         public int MemberId { get; set; }
-        
-        /// <summary>
-        /// Gets or sets the member associated with this case.
-        /// </summary>
-        public Member? Member { get; set; }
                 
         /// <summary>
         /// Gets or sets the row version for optimistic concurrency control.
@@ -141,19 +136,56 @@ namespace StateMachineExperiments.Models
         /// </summary>
         public string? DeterminationResult { get; set; }
         
+        // ========== NAVIGATION PROPERTIES ==========
+        
+        /// <summary>
+        /// Gets or sets the member associated with this case.
+        /// </summary>
+        public Member? Member { get; set; }
+        
         /// <summary>
         /// Gets or sets the medical information associated with this case.
         /// </summary>
         public Medical? Medical { get; set; }
         
         /// <summary>
-        /// Gets or sets the collection of state transitions for this case.
-        /// </summary>unit-specific information associated with this case.
+        /// Gets or sets the unit-specific information associated with this case.
         /// </summary>
         public Unit? Unit { get; set; }
         
         /// <summary>
-        /// Gets or sets the 
+        /// Gets or sets the collection of state transitions for this case.
+        /// </summary>
         public ICollection<LineOfDutyStateTransitionHistory> TransitionHistory { get; set; } = [];
+        
+        /// <summary>
+        /// Gets or sets the collection of appeals associated with this case.
+        /// </summary>
+        public ICollection<Appeal> Appeals { get; set; } = [];
+        
+        /// <summary>
+        /// Gets or sets the collection of comments associated with this case.
+        /// </summary>
+        public ICollection<Comment> Comments { get; set; } = [];
+        
+        /// <summary>
+        /// Gets or sets the collection of findings associated with this case.
+        /// </summary>
+        public ICollection<Finding> Findings { get; set; } = [];
+        
+        /// <summary>
+        /// Gets or sets the post-processing information associated with this case.
+        /// </summary>
+        public PostProcessing? PostProcessing { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the collection of reinvestigation requests where this case is the initial case.
+        /// </summary>
+        public ICollection<ReinvestigationRequest> InitialReinvestigationRequests { get; set; } = [];
+        
+        /// <summary>
+        /// Gets or sets the collection of reinvestigation requests where this case is the reinvestigation case.
+        /// </summary>
+        public ICollection<ReinvestigationRequest> ReinvestigationRequests { get; set; } = [];
     }
 }
