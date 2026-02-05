@@ -4,7 +4,7 @@ using StateMachineExperiments.Models;
 
 namespace StateMachineExperiments.Data.Configurations;
 
-public class SarcConfiguration : IEntityTypeConfiguration<SexualAssaultAndRapeCase>
+public class SexualAssaultAndRapeCaseConfiguration : IEntityTypeConfiguration<SexualAssaultAndRapeCase>
 {
     public void Configure(EntityTypeBuilder<SexualAssaultAndRapeCase> builder)
     {

@@ -4,7 +4,7 @@ using StateMachineExperiments.Models;
 
 namespace StateMachineExperiments.Data
 {
-    public class LodDbContext : DbContext
+    public class CaseManagementDbContext : DbContext
     {
         public DbSet<LineOfDutyCase> LineOfDutyCases { get; set; } = null!;
 
@@ -26,11 +26,11 @@ namespace StateMachineExperiments.Data
         
         public DbSet<ReinvestigationRequest> ReinvestigationRequests { get; set; } = null!;
         
-        public DbSet<SexualAssaultAndRapeCase> Sarcs { get; set; } = null!;
+        public DbSet<SexualAssaultAndRapeCase> SexualAssaultAndRapeCases { get; set; } = null!;
         
         public DbSet<SpecialCase> SpecialCases { get; set; } = null!;
 
-        public LodDbContext(DbContextOptions<LodDbContext> options) : base(options)
+        public CaseManagementDbContext(DbContextOptions<CaseManagementDbContext> options) : base(options)
         {
         }
 
@@ -49,7 +49,7 @@ namespace StateMachineExperiments.Data
             modelBuilder.ApplyConfiguration(new FindingConfiguration());
             modelBuilder.ApplyConfiguration(new PostProcessingConfiguration());
             modelBuilder.ApplyConfiguration(new ReinvestigationRequestConfiguration());
-            modelBuilder.ApplyConfiguration(new SarcConfiguration());
+            modelBuilder.ApplyConfiguration(new SexualAssaultAndRapeCaseConfiguration());
             modelBuilder.ApplyConfiguration(new SpecialCaseConfiguration());
         }
     }

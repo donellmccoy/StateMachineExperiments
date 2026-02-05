@@ -11,9 +11,9 @@ namespace StateMachineExperiments.Services
 {
     public class LineOfDutyDataService : ILineOfDutyDataService
     {
-        private readonly IDbContextFactory<LodDbContext> _contextFactory;
+        private readonly IDbContextFactory<CaseManagementDbContext> _contextFactory;
 
-        public LineOfDutyDataService(IDbContextFactory<LodDbContext> contextFactory)
+        public LineOfDutyDataService(IDbContextFactory<CaseManagementDbContext> contextFactory)
         {
             _contextFactory = contextFactory;
         }
