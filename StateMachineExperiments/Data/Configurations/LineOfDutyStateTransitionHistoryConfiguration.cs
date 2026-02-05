@@ -25,7 +25,7 @@ namespace StateMachineExperiments.Data.Configurations
                 .IsRequired()
                 .HasMaxLength(50);
             
-            builder.Property(e => e.PerformedByAuthority)
+            builder.Property(e => e.LineOfDutyAuthority)
                 .HasMaxLength(100);
             
             // Configure relationship

@@ -147,7 +147,7 @@ namespace StateMachineExperiments.Services
                 ToState = stateMachine.State,
                 Trigger = trigger,
                 Timestamp = DateTime.UtcNow,
-                PerformedByAuthority = authority,
+                LineOfDutyAuthority = authority,
                 Description = notes
             });
         }
