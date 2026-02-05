@@ -103,9 +103,9 @@ namespace StateMachineExperiments.Models
         public string? Icd7thChar { get; set; }
         
         /// <summary>
-        /// Gets or sets the member's origin identifier.
+        /// Gets or sets the ID of the member's origin (foreign key).
         /// </summary>
-        public int? MemberFrom { get; set; }
+        public int? MemberFromId { get; set; }
         
         /// <summary>
         /// Gets or sets the member's component identifier.
@@ -123,9 +123,9 @@ namespace StateMachineExperiments.Models
         public int? Influence { get; set; }
         
         /// <summary>
-        /// Gets or sets whether the member was responsible.
+        /// Gets or sets the ID of the responsible member (foreign key).
         /// </summary>
-        public string? MemberResponsible { get; set; }
+        public int? MemberResponsibleId { get; set; }
         
         /// <summary>
         /// Gets or sets the psychological evaluation status.
@@ -191,12 +191,7 @@ namespace StateMachineExperiments.Models
         /// Gets or sets the board finalization status.
         /// </summary>
         public string? BoardFinalization { get; set; }
-        
-        /// <summary>
-        /// Gets or sets the workflow identifier.
-        /// </summary>
-        public int? Workflow { get; set; }
-        
+                
         /// <summary>
         /// Gets or sets whether LOD initiation has occurred.
         /// </summary>
@@ -228,5 +223,15 @@ namespace StateMachineExperiments.Models
         /// Gets or sets the associated Line of Duty case.
         /// </summary>
         public LineOfDutyCase? LineOfDutyCase { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the responsible member.
+        /// </summary>
+        public Member? MemberResponsible { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the member's origin.
+        /// </summary>
+        public Member? MemberFrom { get; set; }
     }
 }

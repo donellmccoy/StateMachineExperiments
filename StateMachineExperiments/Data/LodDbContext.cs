@@ -25,6 +25,10 @@ namespace StateMachineExperiments.Data
         public DbSet<PostProcessing> PostProcessings { get; set; } = null!;
         
         public DbSet<ReinvestigationRequest> ReinvestigationRequests { get; set; } = null!;
+        
+        public DbSet<SexualAssaultAndRapeCase> Sarcs { get; set; } = null!;
+        
+        public DbSet<SpecialCase> SpecialCases { get; set; } = null!;
 
         public LodDbContext(DbContextOptions<LodDbContext> options) : base(options)
         {
@@ -45,6 +49,8 @@ namespace StateMachineExperiments.Data
             modelBuilder.ApplyConfiguration(new FindingConfiguration());
             modelBuilder.ApplyConfiguration(new PostProcessingConfiguration());
             modelBuilder.ApplyConfiguration(new ReinvestigationRequestConfiguration());
+            modelBuilder.ApplyConfiguration(new SarcConfiguration());
+            modelBuilder.ApplyConfiguration(new SpecialCaseConfiguration());
         }
     }
 }

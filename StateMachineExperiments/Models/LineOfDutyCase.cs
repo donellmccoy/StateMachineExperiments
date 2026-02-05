@@ -187,5 +187,15 @@ namespace StateMachineExperiments.Models
         /// Gets or sets the collection of reinvestigation requests where this case is the reinvestigation case.
         /// </summary>
         public ICollection<ReinvestigationRequest> ReinvestigationRequests { get; set; } = [];
+        
+        /// <summary>
+        /// Gets or sets the collection of SARC (Sexual Assault Response Coordinator) cases associated with this case.
+        /// </summary>
+        public ICollection<SexualAssaultAndRapeCase> Sarcs { get; set; } = [];
+        
+        /// <summary>
+        /// Gets or sets the collection of special cases associated with this case.
+        /// </summary>
+        public ICollection<SpecialCase> SpecialCases { get; set; } = [];
     }
 }

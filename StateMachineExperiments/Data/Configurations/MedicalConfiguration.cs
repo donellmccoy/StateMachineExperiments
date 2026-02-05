@@ -24,7 +24,6 @@ namespace StateMachineExperiments.Data.Configurations
             builder.Property(e => e.PhysicianCancelExplanation).HasMaxLength(4000);
             builder.Property(e => e.DiagnosisText).HasMaxLength(1000);
             builder.Property(e => e.Icd7thChar).HasMaxLength(7);
-            builder.Property(e => e.MemberResponsible).HasMaxLength(10);
             builder.Property(e => e.PsychEval).HasMaxLength(10);
             builder.Property(e => e.RelevantCondition).HasMaxLength(500);
             builder.Property(e => e.OtherTest).HasMaxLength(10);
@@ -41,6 +40,18 @@ namespace StateMachineExperiments.Data.Configurations
                 .WithOne(c => c.Medical)
                 .HasForeignKey<Medical>(e => e.LineOfDutyCaseId)
                 .OnDelete(DeleteBehavior.Cascade);
+            
+            // Configure many-to-one relationship with Member (responsible member)
+            builder.HasOne(e => e.MemberResponsible)
+                .WithMany()
+                .HasForeignKey(e => e.MemberResponsibleId)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+            // Configure many-to-one relationship with Member (member from/origin)
+            builder.HasOne(e => e.MemberFrom)
+                .WithMany()
+                .HasForeignKey(e => e.MemberFromId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

@@ -53,7 +53,7 @@ namespace StateMachineExperiments.Data.Configurations
             builder.HasOne(e => e.LineOfDutyCase)
                 .WithMany(c => c.Appeals)
                 .HasForeignKey(e => e.LineOfDutyCaseId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
